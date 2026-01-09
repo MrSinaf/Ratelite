@@ -23,9 +23,10 @@ use winit::{
     window::{Icon, Window, WindowId},
 };
 
-pub mod window;
+mod arena;
 pub mod scene;
 pub mod vault;
+pub mod window;
 
 pub use scene::Scene;
 pub use scene::SceneAction;
