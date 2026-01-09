@@ -1,8 +1,8 @@
+use crate::Material;
 use crate::Matrix3x3;
+use crate::Mesh;
 use crate::Rect;
 use crate::VecF2;
-use crate::Material;
-use crate::Mesh;
 use crate::window::GameContext;
 
 pub struct Element {
@@ -67,11 +67,13 @@ pub trait Widget {
     }
     fn end_render(&self, _ctx: &GameContext) {}
 
-    fn begin_update(&mut self, _ctx: &GameContext, _parent: &Transform) { }
+    fn begin_update(&mut self, _ctx: &GameContext, _parent: &Transform) {}
     fn update(&mut self, ctx: &GameContext, parent: &Transform) {
+        self.begin_update(ctx, parent);
         self.get_element_mut().internal_update(ctx, parent);
+        self.end_update(ctx, parent);
     }
-    fn end_update(&mut self, _ctx: &GameContext, _parent: &Transform) { }
+    fn end_update(&mut self, _ctx: &GameContext, _parent: &Transform) {}
 
     fn get_element(&self) -> &Element;
     fn get_element_mut(&mut self) -> &mut Element;
