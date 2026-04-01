@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageId>Ratelite.GO</PackageId>
+        <PackageTags>game-engine</PackageTags>
+        <PackageIcon>icon.png</PackageIcon>
+        <Authors>PurrVert</Authors>
+        <Title>Ratelite.GO</Title>
+
+        <AssemblyVersion>0.4.0</AssemblyVersion>
+        <Version>$(AssemblyVersion)-preview</Version>
+        
+        <IncludeProjectReferencesDuringPack>true</IncludeProjectReferencesDuringPack>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="assets/icon.png" Pack="true" PackagePath="icon.png" />
+        <EmbeddedResource Include="assets\**\*"/>
+
+        <ProjectReference Include="..\Ratelite.Core\Ratelite.Core.csproj" />
+    </ItemGroup>
+    
+</Project>

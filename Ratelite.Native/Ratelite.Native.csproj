@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <RootNamespace>Ratelite</RootNamespace>
+
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageId>Ratelite.Native</PackageId>
+        <PackageTags>game-engine</PackageTags>
+        <PackageIcon>icon.png</PackageIcon>
+        <Authors>PurrVert</Authors>
+        <Title>Ratelite.Native</Title>
+        
+        <AssemblyVersion>0.1.0</AssemblyVersion>
+        <Version>$(AssemblyVersion)-preview</Version>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\Ratelite.Core\assets\textures\icon-r.png"
+              PackagePath="/icon.png"
+              Visible="false"
+              Pack="true"/>
+
+        <None Include="assets\deps\win-x64\freetype.dll"
+              PackagePath="runtimes/win-x64/native/" Pack="true"/>
+        <None Include="assets\deps\win-x64\glfw3.dll"
+              PackagePath="runtimes/win-x64/native/" Pack="true"/>
+
+        <Compile Update="**\*.gen.cs">
+            <GeneratedCode>true</GeneratedCode>
+        </Compile>
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,13 @@
+﻿uniform mat3 u_projection;
+uniform mat3 u_model;
+
+uniform sampler2D u_texture;
+
+void mainVertex(in vec2 a_position, in vec2 a_texCoord, out vec2 v_fragCoord) {
+    gl_Position = vec4(u_projection * u_model * vec3(a_position, 1.0), 1.0);
+    v_fragCoord = a_texCoord;
+}
+
+void mainFragment(in vec2 v_fragCoord, out vec4 o_fragColor) {
+    o_fragColor = texture(u_texture, v_fragCoord);
+}

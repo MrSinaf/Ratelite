@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <RootNamespace>Ratelite</RootNamespace>
+
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageId>Ratelite.Core</PackageId>
+        <PackageTags>game-engine</PackageTags>
+        <PackageIcon>icon.png</PackageIcon>
+        <Authors>PurrVert</Authors>
+        <Title>Ratelite.Core</Title>
+        
+        <AssemblyVersion>0.1.0</AssemblyVersion>
+        <Version>$(AssemblyVersion)-preview</Version>
+        
+        <IncludeProjectReferencesDuringPack>true</IncludeProjectReferencesDuringPack>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="assets\textures\icon-r.png" PackagePath="/icon.png" Pack="true"/>
+        <EmbeddedResource Include="assets\**\*"/>
+
+        <ProjectReference Include="..\Ratelite.Native\Ratelite.Native.csproj" />
+        <PackageReference Include="JetBrains.Annotations" Version="2025.2.4"/>
+    </ItemGroup>
+
+</Project>
