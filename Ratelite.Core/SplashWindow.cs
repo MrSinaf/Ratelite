@@ -8,14 +8,13 @@ namespace Ratelite;
 public class SplashWindow
 {
 	internal readonly Window window;
+	private readonly List<(Mesh mesh, Material material)> objects = [];
 	
 	public bool isLoaded { get; private set; }
 	
-	private Progress<float> progress = new ();
+	private float progress;
+	private float currentProgress;
 	private RConfig config;
-	
-	public static Mesh mesh = null!;
-	public static Material material = null!;
 	
 	public SplashWindow(RConfig config)
 	{
@@ -37,7 +36,7 @@ public class SplashWindow
 	private void Start()
 	{
 		GL.ClearColor(Color.transparent);
-		Loading(progress).ContinueWith(_ => window.Close());
+		Loading().ContinueWith(_ => window.Close());
 		
 		using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(
 			"Ratelite.assets.textures.icon-rat.png"
@@ -50,9 +49,9 @@ public class SplashWindow
 		);
 		var shader = new Shader(
 			"""
-			uniform mat3 u_projection;
 			layout (location = 0) in vec2 a_pos;
 			layout (location = 1) in vec2 a_texCoord;
+			uniform mat3 u_projection;
 			uniform mat3 u_model;
 			out vec2 v_texCoord;
 			void main() {
@@ -63,39 +62,83 @@ public class SplashWindow
 			"""
 			in vec2 v_texCoord;
 			uniform sampler2D u_texture;
+			uniform vec4 u_tint;
 			out vec4 o_fragColor;
 			void main() {
 			    vec4 color = texture(u_texture, v_texCoord);
-			    o_fragColor = color;
+			    o_fragColor = color * u_tint;
 			}
 			"""
 		);
-		material = new Material(
-			shader,
-			("u_texture", texture),
-			("u_projection", Matrix3X3.CreateOrthographic(256, 256)),
-			("u_model", Matrix3X3.CreateScale(new Vector2(2)))
+		MainThreadQueue.EnqueueRenderer(() =>
+				shader.gProgram.SetUniform(
+					"u_projection",
+					Matrix3X3.CreateOrthographic(256, 266, false)
+				)
 		);
-		mesh = MeshFactory.CreateQuad(texture.size, texture.size * 0.5F);
+		objects.Add(
+			(
+				MeshFactory.CreateQuad(texture.size * 2, new Vector2(0, -20)),
+				new Material(
+					shader,
+					("u_texture", texture),
+					("u_tint", Color.white),
+					("u_model", Matrix3X3.Identity())
+				)
+			)
+		);
+		objects.Add(
+			(
+				MeshFactory.CreateQuad(new Vector2(256, 20), Vector2.zero),
+				new Material(
+					shader,
+					("u_texture", new Texture2D(1, 1, [Color.white])),
+					("u_tint", Color.black),
+					("u_model", Matrix3X3.Identity())
+				)
+			)
+		);
+		objects.Add(
+			(
+				MeshFactory.CreateQuad(new Vector2(246, 10), Vector2.zero),
+				new Material(
+					shader,
+					("u_texture", new Texture2D(1, 1, [Color.white])),
+					("u_tint", new Color(0x35775C)),
+					("u_model", Matrix3X3.CreateScale(new Vector2(0.5F, 1)) *
+								Matrix3X3.CreateTranslation(new Vector2(5)))
+				)
+			)
+		);
 	}
 	
 	private void Render()
 	{
-		material.ApplyProperties();
-		mesh.Draw();
+		MainThreadQueue.ExecuteAllRenderer();
+		currentProgress = float.Lerp(currentProgress, progress, Time.delta * 15);
+		objects[2].material.SetProperty(
+			"u_model",
+			Matrix3X3.CreateScale(new Vector2(currentProgress, 1)) *
+			Matrix3X3.CreateTranslation(new Vector2(5))
+		);
+		
+		foreach (var obj in objects)
+		{
+			obj.material.ApplyProperties();
+			obj.mesh.Draw();
+		}
 	}
 	
 	public void Destroy()
 	{
 		window.Destroy();
 		config = null!;
-		progress = null!;
 	}
 	
-	private async Task Loading(IProgress<float> progress)
+	private async Task Loading()
 	{
-		var delta = config.modules.Count + 1 / 1;
-		var currentProgress = 0F;
+		await Task.Delay(500);
+		var delta = 1F / config.modules.Count;
 		foreach (var module in config.modules)
 		{
 			var moduleName = module.GetType().Name.Replace("Module", "");
@@ -111,20 +154,22 @@ public class SplashWindow
 				}
 				catch (Exception e)
 				{
-					Log.Write(
-						$"Error intializing module (ㆆ_ㆆ) : {moduleName}\n{e.Message}",
-						Log.Level.Error
-					);
+					Log.Write($"Error intializing module (ㆆ_ㆆ) : {moduleName}", e);
+					await Task.Delay(-1);
 				}
 			}
 			else
 				Log.Write($"Module '{moduleName}' ready \\^o^/", Log.Level.Info);
 			
-			currentProgress += delta;
-			progress.Report(currentProgress);
+			
+			progress += delta;
 		}
 		
+		await Task.Delay(500);
+		progress = currentProgress = 0;
+		
 		var progressAssets = new Progress<float>();
+		progressAssets.ProgressChanged += (_, value) => progress = value;
 		try
 		{
 			await config.Action(progressAssets);
@@ -149,7 +194,7 @@ public class SplashWindow
 			);
 			throw;
 		}
-		await Task.Delay(2000);
+		await Task.Delay(1000);
 		isLoaded = true;
 	}
 }
