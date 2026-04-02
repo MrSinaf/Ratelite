@@ -26,6 +26,7 @@ public class Label : UIElement
 		if (text != null)
 			this.text = text;
 		
+		captureCursorEvent = false;
 		UIPrefab.Apply(prefab, this);
 	}
 	

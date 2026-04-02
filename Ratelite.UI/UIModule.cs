@@ -3,7 +3,7 @@ using Ratelite.Utils;
 
 namespace Ratelite.UI;
 
-public class UIModule : ILoadableModule, IUpdatableModule
+public class UIModule : ILoadableModule
 {
 	public const string DEFAULT_SHADER = "@ui/default.rshad";
 	public const string DEFAULT_MATERIAL = "@ui/default.mat";
@@ -18,11 +18,6 @@ public class UIModule : ILoadableModule, IUpdatableModule
 			DEFAULT_MESH,
 			MeshFactory.CreateQuad(Vector2.one)
 		);
-	}
-	
-	public void Update()
-	{
-		UIEvent.Update();
 	}
 	
 	public async Task Load()

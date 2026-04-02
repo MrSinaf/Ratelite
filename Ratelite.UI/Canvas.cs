@@ -6,20 +6,47 @@ public class Canvas : IPlugin
 	private readonly UIElement tree = new ();
 	
 	public RootElement root { get; private set; } = null!;
+	public bool hasElementHovered => previousElementsHovered.Count > 0;
+	
+	private readonly Stack<UIElement> stackElementHover = [];
+	private HashSet<UIElement> previousElementsHovered = [];
 	
 	public void Init()
 	{
 		var window = R.game.window;
 		window.resized += OnWindowResized;
 		
-		root = new RootElement { size = window.size };
+		root = new RootElement { name = "root", size = window.size, isInteractif = false };
 		uniform.projection = Matrix3X3.CreateOrthographic(root.size.x, root.size.y, false);
 		uniform.resolution = root.size;
 	}
 	
 	public void Update()
 	{
-		root.InternalUpdate(tree);
+		root.InternalUpdate(tree, stackElementHover);
+		
+		var newElementsHovered = new HashSet<UIElement>();
+		while (stackElementHover.TryPop(out var e))
+		{
+			if (!e.isInteractif)
+				continue;
+			
+			var inPrevious = previousElementsHovered.Contains(e);
+			previousElementsHovered.Remove(e);
+			
+			newElementsHovered.Add(e);
+			if (!inPrevious)
+				e.OnCursorEnter();
+			
+			if (e.captureCursorEvent)
+				break;
+		}
+		
+		foreach (var e in previousElementsHovered)
+			e.OnCursorExit();
+		
+		stackElementHover.Clear();
+		previousElementsHovered = newElementsHovered;
 	}
 	
 	public void Render()

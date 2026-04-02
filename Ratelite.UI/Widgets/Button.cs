@@ -21,7 +21,7 @@ public class Button : UIElement
 	
 	private void OnMouseButton(MouseButton button)
 	{
-		if (button == MouseButton.Left && ContainsPoint(R.game.window.cursorPosition))
+		if (button == MouseButton.Left && isCursorOver)
 			onClick.Invoke();
 	}
 	
@@ -41,8 +41,8 @@ public class Button : UIElement
 		
 		e.label.pivot = e.label.anchors = new Vector2(0.5F);
 		
-		UIEvent.Register(e, UIEvent.Type.CursorEnter, OnMouseEnter);
-		UIEvent.Register(e, UIEvent.Type.CursorExit, OnMouseExit);
+		e.cursorEnter += OnMouseEnter;
+		e.cursorExit += OnMouseExit;
 		
 		void OnMouseExit(UIElement e)
 			=> e.tint = new Color(0x26354A);

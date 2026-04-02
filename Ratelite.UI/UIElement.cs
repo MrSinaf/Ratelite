@@ -14,8 +14,11 @@ public class UIElement
 	public UIElement[] childrenArray => children.ToArray();
 	
 	public bool isActif => active;
-	public bool canDraw => isObservable && material is not null && mesh is { isValid: true }; 
+	public bool canDraw => isObservable && material is not null && mesh is { isValid: true };
 	public bool isObservable => clipArea.size != Vector2Int.zero;
+	
+	public event Action<UIElement> cursorEnter = delegate { };
+	public event Action<UIElement> cursorExit = delegate { };
 	
 	public Matrix3X3 matrix { get; private set; } = Matrix3X3.Identity();
 	public Matrix3X3 inversedMatrix { get; private set; } = Matrix3X3.Identity();
@@ -24,9 +27,13 @@ public class UIElement
 	public Vector2 realPosition { get; private set; }
 	public Vector2 calculatePosition { get; private set; }
 	public Vector2 realSize { get; private set; }
-	public RegionInt clipArea { get; protected set; }
+	public RegionInt clipArea { get; private set; }
+	public bool isCursorOver { get; private set; }
 	
 	public virtual bool active { get; set; } = true;
+	public bool captureCursorEvent { get; set; } = true;
+	public bool isInteractif { get; set; } = true;
+	
 	public virtual Mesh? mesh { get; set; }
 	public virtual MaterialUI? material { get; set; }
 	public virtual Color tint { get; set; } = Color.white;
@@ -204,12 +211,23 @@ public class UIElement
 	{
 		OnDestroy();
 		parent?.RemoveChild(this);
-		UIEvent.UnRegisterAllEvents(this);
 		foreach (var child in childrenArray)
 			child.Destroy();
 	}
 	
-	internal void InternalUpdate(UIElement parent)
+	internal void OnCursorEnter()
+	{
+		isCursorOver = true;
+		cursorEnter.Invoke(this);
+	}
+	
+	internal void OnCursorExit()
+	{
+		isCursorOver = false;
+		cursorExit.Invoke(this);
+	}
+	
+	internal void InternalUpdate(UIElement parent, Stack<UIElement>? stackElementHover)
 	{
 		if (!isActif)
 			return;
@@ -227,8 +245,16 @@ public class UIElement
 			CalculeMatrix();
 		}
 		
+		if (stackElementHover != null)
+		{
+			if (ContainsPoint(R.game.window.cursorPosition))
+				stackElementHover.Push(this);
+			else
+				stackElementHover = null;
+		}
+		
 		foreach (var child in children)
-			child.InternalUpdate(this);
+			child.InternalUpdate(this, stackElementHover);
 		isDirty = false;
 		EndUpdate();
 	}
@@ -289,7 +315,9 @@ public class UIElement
 								  Matrix3X3.CreateRotation(float.DegreesToRadians(rotation)) *
 								  Matrix3X3.CreateTranslation(pivotPosition))
 						* parent.rotatedMatrix;
-		matrix = Matrix3X3.CreateScale(scaleWithSize ? realSize.ToVector2Int() : scale.ToVector2Int()) *
+		matrix = Matrix3X3.CreateScale(
+					 scaleWithSize ? realSize.ToVector2Int() : scale.ToVector2Int()
+				 ) *
 				 Matrix3X3.CreateTranslation(realPosition.ToVector2Int()) * rotatedMatrix;
 		inversedMatrix = matrix.Inverse();
 		CalculeClipArea();
