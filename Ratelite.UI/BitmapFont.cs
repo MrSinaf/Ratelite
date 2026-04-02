@@ -1,5 +1,6 @@
 ﻿using Ratelite.Rendering;
 using Ratelite.Resources;
+using Ratelite.Utils;
 
 namespace Ratelite.UI;
 
@@ -16,11 +17,15 @@ public class BitmapFont : IResource<BitmapFont>
 		
 		var material = new MaterialUI();
 		font.GetBitmap();
-		var texture = new Texture2D(font.size.x, font.size.y, font.colors);
-		texture.SetFilter(TextureMin.Linear, TextureMag.Linear);
-		texture.SetWrap(TextureWrap.ClampToEdge);
-		texture.gTexture.GenerateMipmap();
+		var texture = new Texture2D(font.size.x, font.size.y, font.colors!);
 		material.SetTexture(texture);
+		
+		MainThreadQueue.EnqueueRenderer(() =>
+		{
+			texture.SetFilter(TextureMin.Linear, TextureMag.Linear);
+			texture.SetWrap(TextureWrap.ClampToEdge);
+			texture.gTexture.GenerateMipmap();
+		});
 		
 		return new BitmapFont {
 			data = font,

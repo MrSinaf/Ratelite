@@ -4,7 +4,7 @@
 // Faire que les Texture2D gère ça comme fait un mesh par exemple, avec un Bind simple!
 public abstract class Texture
 {
-	public readonly GTexture gTexture = new ();
+	public GTexture gTexture = null!;
 	
 	public void SetWrap(TextureWrap wrap)
 	{

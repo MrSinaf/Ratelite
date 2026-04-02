@@ -1,4 +1,5 @@
 ﻿using Ratelite.Rendering;
+using Ratelite.Utils;
 
 namespace Ratelite.Resources;
 
@@ -6,15 +7,18 @@ public class Shader : IResource<Shader>
 {
 	private const string OPENGL_VERSION = "#version 330 core";
 	
-	public readonly GProgram gProgram;
+	public GProgram gProgram;
 	
 	public Shader(string vertexShader, string fragmentShader)
 	{
-		gProgram = new GProgram();
-		gProgram.Compile(
-			OPENGL_VERSION + "\n" + vertexShader,
-			OPENGL_VERSION + "\n" + fragmentShader
-		);
+		MainThreadQueue.EnqueueRenderer(() =>
+		{
+			gProgram = new GProgram();
+			gProgram.Compile(
+				OPENGL_VERSION + "\n" + vertexShader,
+				OPENGL_VERSION + "\n" + fragmentShader
+			);
+		});
 	}
 	
 	public static Shader Load(Stream stream)

@@ -1,5 +1,6 @@
 ﻿using Ratelite.Bindings;
 using Ratelite.Rendering;
+using Ratelite.Utils;
 
 namespace Ratelite.Resources;
 
@@ -23,9 +24,13 @@ public class Texture2D : Texture, IResource<Texture2D>, IDisposable
 		
 		this.pixels = pixels;
 		
-		gTexture.SetImage2D((uint)width, (uint)height, pixels);
-		SetFilter(TextureMin.Nearest, TextureMag.Nearest);
-		SetWrap(TextureWrap.ClampToEdge);
+		MainThreadQueue.EnqueueRenderer(() =>
+		{
+			gTexture = new GTexture();
+			gTexture.SetImage2D((uint)width, (uint)height, pixels);
+			SetFilter(TextureMin.Nearest, TextureMag.Nearest);
+			SetWrap(TextureWrap.ClampToEdge);
+		});
 	}
 	
 	public Region GetUVRegion(RectInt target)
