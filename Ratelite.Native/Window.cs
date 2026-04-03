@@ -36,10 +36,12 @@ public sealed unsafe class Window
 	public event Action<Key, int> keyReleased = delegate { };
 	public event Action<char> charTyped = delegate { };
 	
+	public event Action<Vector2> scaled = delegate { };
 	public event Action<Vector2Int> resized = delegate { };
 	public event Action<Vector2Int> moved = delegate { };
 	
 	public Vector2Int frameBufferSize { get; private set; }
+	public Vector2 scale { get; private set; }
 	public Vector2 cursorPosition { get; private set; } = new (-1);
 	
 	public Vector2Int position
@@ -107,8 +109,6 @@ public sealed unsafe class Window
 		EnsureInit();
 		glfwDefaultWindowHints();
 		glfwWindowHint(Hints.TRANSPARENT_FRAMEBUFFER, options.transparent ? 1 : 0);
-		glfwWindowHint(Hints.SCALE_TO_MONITOR, 1);
-
 		
 		Console.OutputEncoding = Encoding.UTF8;
 		var monitor = options.fullscreen ? glfwGetPrimaryMonitor() : null;
@@ -162,6 +162,11 @@ public sealed unsafe class Window
 		glfwSetCursorEnterCallback(handle, &OnCursorEnter);
 		glfwSetScrollCallback(handle, &OnCursorScroll);
 		
+		float xscale, yscale;
+		glfwGetWindowContentScale(handle, &xscale, &yscale);
+		scale = new Vector2(xscale, yscale);
+		
+		glfwSetWindowContentScaleCallback(handle, &OnWindowContentScale);
 		glfwSetFramebufferSizeCallback(handle, &OnFramebufferResize);
 		glfwSetWindowSizeCallback(handle, &OnWindowResize);
 		glfwSetWindowPosCallback(handle, &OnWindowMove);
@@ -272,6 +277,9 @@ public sealed unsafe class Window
 	private static void OnChar(GLFWwindow* window, uint c)
 		=> current.charTyped((char)c);
 	
+	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+	public static void OnWindowContentScale(GLFWwindow* window, float xscale, float yscale)
+		=> current.scaled(current.scale = new Vector2(xscale, yscale));
 	
 	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
 	private static void OnFramebufferResize(GLFWwindow* window, int width, int height)
