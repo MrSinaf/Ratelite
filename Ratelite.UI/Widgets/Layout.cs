@@ -93,6 +93,7 @@ public class Layout : UIElement
 		// TODO > Il se base sur la size des UIElement, il faut plutôt gérer ça via leur realSize
 		// Faut alors pouvoir générer leur taille avant d'afficher !
 		var spacing = index == 0 ? 0 : this.spacing;
+		anchorMax = anchorMin;	// S'assure que les anchors sont identiques.
 		
 		if (orientation == Orientation.Vertical)
 		{

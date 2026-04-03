@@ -12,6 +12,7 @@ public class ScrollView : UIElement
 		UIElement content,
 		bool withHorizontal = true,
 		bool withVertical = true,
+		bool startOnTop = true,
 		string prefab = ""
 	)
 	{
@@ -21,13 +22,15 @@ public class ScrollView : UIElement
 		base.AddChild(
 			horizontalScroll = new ScrollBar(OnHorizontalScroll, Orientation.Horizontal)
 			{
-				active = withHorizontal
+				active = withHorizontal,
+				cursorPosition = startOnTop ? float.MaxValue : 0
 			}
 		);
 		base.AddChild(
 			verticalScroll = new ScrollBar(OnVerticalScroll, Orientation.Vertical)
 			{
-				active = withVertical
+				active = withVertical,
+				cursorPosition = startOnTop ? float.MaxValue : 0
 			}
 		);
 		mask.AddChild(content);
@@ -39,13 +42,17 @@ public class ScrollView : UIElement
 	private void OnChanged(UIElement _)
 	{
 		horizontalScroll.availableLenght = mask.realSize.x;
+		horizontalScroll.contentLenght = content.realSize.x;
 		verticalScroll.availableLenght = mask.realSize.y;
+		verticalScroll.contentLenght = content.realSize.y; 
 	}
 	
 	private void ContentChanged(UIElement _)
 	{
 		horizontalScroll.availableLenght = mask.realSize.x;
+		horizontalScroll.contentLenght = content.realSize.x;
 		verticalScroll.availableLenght = mask.realSize.y; 
+		verticalScroll.contentLenght = content.realSize.y; 
 	}
 	
 	private void OnHorizontalScroll(float delta)

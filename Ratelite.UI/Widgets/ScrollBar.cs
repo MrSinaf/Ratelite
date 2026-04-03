@@ -18,7 +18,7 @@ public class ScrollBar : UIElement
 		set
 		{
 			_cursorPosition = value;
-			CursorPositionUpdated();
+			isLocalDirty = true;
 		}
 	}
 	
@@ -27,6 +27,9 @@ public class ScrollBar : UIElement
 		get;
 		set
 		{
+			if (field == value)
+				return;
+			
 			field = value;
 			avalaibleIsGreatestContent = availableLenght > contentLenght;
 			ContentLenghtUpdated();
@@ -38,6 +41,9 @@ public class ScrollBar : UIElement
 		get;
 		set
 		{
+			if (field == value)
+				return;
+			
 			field = value;
 			avalaibleIsGreatestContent = availableLenght > contentLenght;
 			ContentLenghtUpdated();
@@ -45,6 +51,8 @@ public class ScrollBar : UIElement
 	}
 	
 	public Action<float> onCursorChanged;
+	
+	private bool isLocalDirty;
 	
 	public ScrollBar(Action<float> onCursorChanged, Orientation orientation, string prefab = "")
 	{
@@ -55,6 +63,16 @@ public class ScrollBar : UIElement
 		Window.current.mouseButtonPressed += OnMouseButtonPressed;
 		Window.current.mouseButtonReleased += OnMouseButtonReleased;
 		UIPrefab.Apply(prefab, this);
+	}
+	
+	protected override void EndUpdate()
+	{
+		// TODO > Chercher une manière de corriger le fait que cette action se fait tardivement
+		// Pour le moment, nécessaire de le faire ici, pour que les enfants soient calculé (dans
+		// le cas d'un Layout). Et il est nécessaire de le faire tardivement, car on peut vouloir
+		// afficher la liste depuis le haut (voir ScrollView).
+		if (isLocalDirty)
+			CursorPositionUpdated();
 	}
 	
 	private void CursorPositionUpdated()
