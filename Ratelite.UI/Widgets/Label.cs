@@ -17,9 +17,20 @@ public class Label : UIElement
 			isDirtyText = true;
 		}
 	} = string.Empty;
+	public Font? font
+	{
+		get;
+		set
+		{
+			if (field == value)
+				return;
+			
+			field = value;
+			isDirtyText = true;
+		}
+	}
 	
 	private bool isDirtyText;
-	private Font font;
 	
 	public Label(string? text = null, string prefab = "")
 	{
@@ -38,6 +49,9 @@ public class Label : UIElement
 	
 	private void GenerateMeshes()
 	{
+		if (font == null)
+			return;
+		
 		var meshes = new (Rect vertices, Region uvs)[text.Length];
 		var position = Vector2.zero;
 		for (var i = 0; i < text.Length; i++)
@@ -61,9 +75,7 @@ public class Label : UIElement
 		}
 		
 		if (mesh?.vertices.Length == text.Length * 4)
-		{
 			MeshFactory.SetQuadsVertices(mesh, meshes);
-		}
 		else
 		{
 			meshOffset = new Vector2(0, -position.y + font.baseLine);
@@ -79,7 +91,7 @@ public class Label : UIElement
 	[IsDefaultPrefab]
 	public static void DefaultPrefrab(Label e)
 	{
-		var font = Vault.GetAsset<BitmapFont>(UIModule.DEFAULT_FONT);
+		var font = Vault.GetAsset<BitmapFont>(UIModule.DEFAULT_FONT)!;
 		e.font = font.data;
 		e.material = font.material;
 		e.scaleWithSize = false;

@@ -7,7 +7,7 @@ public class Shader : IResource<Shader>
 {
 	private const string OPENGL_VERSION = "#version 330 core";
 	
-	public GProgram gProgram;
+	public GProgram gProgram = null!;
 	
 	public Shader(string vertexShader, string fragmentShader)
 	{

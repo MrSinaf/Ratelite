@@ -267,7 +267,7 @@ public class UIElement
 		BeginRender();
 		if (canDraw)
 		{
-			material.ApplyProperties();
+			material!.ApplyProperties();
 			
 			var shader = material.shader;
 			shader.gProgram.SetUniform("u_model", matrix);
@@ -277,7 +277,7 @@ public class UIElement
 			shader.gProgram.SetUniform("u_cornerRadius", cornerRadius);
 			shader.gProgram.SetUniform("u_uv", uv);
 			
-			mesh.Draw();
+			mesh!.Draw();
 			
 			// TODO Ajouter comme élément par défaut, car le shader ne support pas pour le moment
 			// les paramètres par défaut...
@@ -405,7 +405,7 @@ public class UIElement
 			)
 		);
 		if (overflowHidden)
-			clipArea = clipArea.Intersection(parent.clipArea);
+			clipArea = clipArea.Intersection(parent!.clipArea);
 	}
 	
 	public override string ToString() => name;

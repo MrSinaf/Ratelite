@@ -98,9 +98,9 @@ public class RObject
 		if (!isActif || !canDraw)
 			return;
 		
-		material.ApplyProperties();
-		material.shader.gProgram.SetUniform("u_model", matrix);
-		mesh.Draw();
+		material!.ApplyProperties();
+		material!.shader.gProgram.SetUniform("u_model", matrix);
+		mesh!.Draw();
 	}
 	
 	internal void InternalUpdate()
