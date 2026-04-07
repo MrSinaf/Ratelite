@@ -94,6 +94,6 @@ public class Label : UIElement
 		var font = Vault.GetAsset<BitmapFont>(UIModule.DEFAULT_FONT)!;
 		e.font = font.data;
 		e.material = font.material;
-		e.scaleWithSize = false;
+		e.useMeshBoundsSize = false;
 	}
 }

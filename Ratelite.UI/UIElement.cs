@@ -69,7 +69,7 @@ public class UIElement
 			field = value;
 			isDirty = true;
 		}
-	}
+	} = Vector2.one;
 	public virtual Vector2 scale
 	{
 		get;
@@ -133,10 +133,10 @@ public class UIElement
 			isDirty = true;
 		}
 	}
-	public bool scaleWithSize
+	public bool useMeshBoundsSize
 	{
 		get;
-		protected set
+		set
 		{
 			field = value;
 			isDirty = true;
@@ -172,7 +172,7 @@ public class UIElement
 		if (mesh is { isValid: true })
 		{
 			var localPoint = inversedMatrix.TransformPoint(point - mesh.bounds.position);
-			return scaleWithSize
+			return useMeshBoundsSize
 					? localPoint.IsInsideBounds(mesh.bounds.position, mesh.bounds.size)
 					: localPoint.IsInsideBounds(Vector2.zero, realSize);
 		}
@@ -295,7 +295,7 @@ public class UIElement
 		if (mesh != null)
 		{
 			bounds = new Rect(mesh.bounds.position, mesh.bounds.size);
-			bounds.size = !scaleWithSize ? size : bounds.size * size;
+			bounds.size = !useMeshBoundsSize ? size : bounds.size * size;
 		}
 		else
 			bounds = new Rect(Vector2.zero, size);
@@ -305,7 +305,7 @@ public class UIElement
 		calculatePosition = realPosition = parent!.calculatePosition + position - cOffset;
 		realSize = cSize;
 		
-		if (!scaleWithSize && mesh != null)
+		if (!useMeshBoundsSize && mesh != null)
 			realPosition += mesh.bounds.position + meshOffset * scale;
 		
 		var pivotPosition = realPosition + pivot * realSize;
@@ -316,7 +316,7 @@ public class UIElement
 								  Matrix3X3.CreateTranslation(pivotPosition))
 						* parent.rotatedMatrix;
 		matrix = Matrix3X3.CreateScale(
-					 scaleWithSize ? realSize.ToVector2Int() : scale.ToVector2Int()
+					 useMeshBoundsSize ? realSize.ToVector2Int() : scale.ToVector2Int()
 				 ) *
 				 Matrix3X3.CreateTranslation(realPosition.ToVector2Int()) * rotatedMatrix;
 		inversedMatrix = matrix.Inverse();
@@ -347,7 +347,7 @@ public class UIElement
 		{
 			cSize.x = bounds.size.x * scale.x;
 			cOffset.x = pivot.x * cSize.x +
-						(scaleWithSize ? bounds.position.x * cSize.x : bounds.position.x);
+						(useMeshBoundsSize ? bounds.position.x * cSize.x : bounds.position.x);
 		}
 		
 		if (Math.Abs(anchorMin.y - anchorMax.y) > float.Epsilon) // Anchor vertical
@@ -360,7 +360,7 @@ public class UIElement
 		{
 			cSize.y = bounds.size.y * scale.y;
 			cOffset.y = pivot.y * cSize.y +
-						(scaleWithSize ? bounds.position.y * cSize.y : bounds.position.y);
+						(useMeshBoundsSize ? bounds.position.y * cSize.y : bounds.position.y);
 		}
 		
 		cOffset -= anchorMinPos;
