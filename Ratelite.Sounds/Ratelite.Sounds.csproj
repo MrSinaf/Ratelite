@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageId>Ratelite.Sounds</PackageId>
+        <PackageTags>game-engine</PackageTags>
+        <PackageIcon>icon.png</PackageIcon>
+        <Authors>PurrVert</Authors>
+        <Title>Ratelite.Sounds</Title>
+
+        <AssemblyVersion>0.1.0</AssemblyVersion>
+        <Version>$(AssemblyVersion)-preview</Version>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\Ratelite.Core\assets\textures\icon-r.png"
+              PackagePath="/icon.png"
+              Visible="false"
+              Pack="true"/>
+        
+      <ProjectReference Include="..\Ratelite.Core\Ratelite.Core.csproj" />
+    </ItemGroup>
+
+</Project>

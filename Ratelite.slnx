@@ -2,5 +2,6 @@
   <Project Path="Ratelite.Core/Ratelite.Core.csproj" />
   <Project Path="Ratelite.GO/Ratelite.GO.csproj" />
   <Project Path="Ratelite.Native/Ratelite.Native.csproj" />
+  <Project Path="Ratelite.Sounds/Ratelite.Sounds.csproj" />
   <Project Path="Ratelite.UI/Ratelite.UI.csproj" />
 </Solution>
