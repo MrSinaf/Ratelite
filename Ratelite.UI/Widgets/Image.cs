@@ -6,7 +6,7 @@ public class Image : UIElement
 {
 	public Texture2D texture;
 	
-	public Image(Texture2D texture, MaterialUI material, string prefab = "")
+	public Image(Texture2D texture, MaterialUI material, string? prefab = "")
 	{
 		base.mesh = Vault.GetAsset<Mesh>(UIModule.DEFAULT_MESH);
 		base.material = material;

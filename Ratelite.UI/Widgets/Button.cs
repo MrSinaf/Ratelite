@@ -13,7 +13,7 @@ public class Button : UIElement
 	public event Action<UIElement> onPressed = delegate { };
 	public event Action<UIElement> onReleased = delegate { };
 	
-	public Button(string text, Action? onClick, string prefab = "")
+	public Button(string text, Action? onClick, string? prefab = "")
 	{
 		base.AddChild(label = new Label(text));
 		this.onClick += onClick;

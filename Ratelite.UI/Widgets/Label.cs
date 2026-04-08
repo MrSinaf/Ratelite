@@ -32,7 +32,7 @@ public class Label : UIElement
 	
 	private bool isDirtyText;
 	
-	public Label(string? text = null, string prefab = "")
+	public Label(string? text = null, string? prefab = "")
 	{
 		if (text != null)
 			this.text = text;

@@ -4,7 +4,7 @@ namespace Ratelite.UI.Widgets;
 
 public class Panel : UIElement
 {
-	public Panel(string prefab = "")
+	public Panel(string? prefab = "")
 	{
 		UIPrefab.Apply(prefab, this);
 	}

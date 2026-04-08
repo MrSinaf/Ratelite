@@ -13,7 +13,7 @@ public class ScrollView : UIElement
 		bool withHorizontal = true,
 		bool withVertical = true,
 		bool startOnTop = true,
-		string prefab = ""
+		string? prefab = ""
 	)
 	{
 		this.content = content;

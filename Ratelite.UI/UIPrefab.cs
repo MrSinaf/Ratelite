@@ -25,8 +25,11 @@ public static class UIPrefab
 		}
 	}
 	
-	public static void Apply<T>(string name, T element) where T : UIElement
+	public static void Apply<T>(string? name, T element) where T : UIElement
 	{
+		if (name == null)
+			return;
+		
 		if (!prefabs.TryGetValue(typeof(T), out var actions))
 		{
 			if (name == string.Empty)

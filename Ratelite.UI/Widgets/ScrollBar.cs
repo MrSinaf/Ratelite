@@ -54,7 +54,7 @@ public class ScrollBar : UIElement
 	
 	private bool isLocalDirty;
 	
-	public ScrollBar(Action<float> onCursorChanged, Orientation orientation, string prefab = "")
+	public ScrollBar(Action<float> onCursorChanged, Orientation orientation, string? prefab = "")
 	{
 		this.onCursorChanged = onCursorChanged;
 		this.orientation = orientation;
