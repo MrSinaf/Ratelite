@@ -1,5 +1,9 @@
 using System.Runtime.InteropServices;
 
+/*
+ * TODO > Refactoriser /FreeType pour le rendre plus... csharp -_-
+ */
+
 namespace Ratelite.Bindings
 {
     public unsafe class FT
