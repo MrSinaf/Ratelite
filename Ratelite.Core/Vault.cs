@@ -77,7 +77,7 @@ public static class Vault
 			);
 		
 		await using var stream = File.OpenRead(fullPath);
-		var asset = T.Load(stream);
+		var asset = T.Load(stream);	// TODO > Fournir une class plus complète donnant divers infos
 		return asset;
 	}
 	
