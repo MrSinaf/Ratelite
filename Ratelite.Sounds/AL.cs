@@ -38,6 +38,9 @@ public static unsafe class AL
 
     public static void Source(uint source, ALSourceParam param, float x, float y, float z)
         => alSource3f(source, (int)param, x, y, z);
+    
+    public static void Volume(float value)
+        => alListenerf(0x100A, value);
 
     public static void PlaySource(uint source)  => alSourcePlay(source);
     public static void StopSource(uint source)  => alSourceStop(source);

@@ -25,6 +25,8 @@ internal static unsafe partial class ALNative
 	[LibraryImport("soft_oal")]
 	internal static partial void alSource3f(uint source, int param, float v1, float v2, float v3);
 	[LibraryImport("soft_oal")]
+	internal static partial void alListenerf(int param, float value);
+	[LibraryImport("soft_oal")]
 	internal static partial void alSourcePlay(uint source);
 	[LibraryImport("soft_oal")]
 	internal static partial void alSourceStop(uint source);
