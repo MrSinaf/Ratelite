@@ -39,6 +39,7 @@ public sealed unsafe class Window
 	public event Action<Vector2> scaled = delegate { };
 	public event Action<Vector2Int> resized = delegate { };
 	public event Action<Vector2Int> moved = delegate { };
+	public event Action closed = delegate { };
 	
 	public Vector2Int frameBufferSize { get; private set; }
 	public Vector2 scale { get; private set; }
@@ -166,6 +167,7 @@ public sealed unsafe class Window
 		glfwGetWindowContentScale(handle, &xscale, &yscale);
 		scale = new Vector2(xscale, yscale);
 		
+		glfwSetWindowCloseCallback(handle, &OnWindowClose);
 		glfwSetWindowContentScaleCallback(handle, &OnWindowContentScale);
 		glfwSetFramebufferSizeCallback(handle, &OnFramebufferResize);
 		glfwSetWindowSizeCallback(handle, &OnWindowResize);
@@ -238,7 +240,10 @@ public sealed unsafe class Window
 		=> glfwSwapBuffers(handle);
 	
 	public void Close()
-		=> glfwSetWindowShouldClose(handle, 1);
+	{
+		closed();
+		glfwSetWindowShouldClose(handle, 1);
+	}
 	
 	public void Destroy()
 		=> glfwDestroyWindow(handle);
@@ -280,6 +285,11 @@ public sealed unsafe class Window
 	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
 	public static void OnWindowContentScale(GLFWwindow* window, float xscale, float yscale)
 		=> current.scaled(current.scale = new Vector2(xscale, yscale));
+	
+	
+	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+	public static void OnWindowClose(GLFWwindow* window)
+		=> current.closed();
 	
 	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
 	private static void OnFramebufferResize(GLFWwindow* window, int width, int height)

@@ -10,6 +10,7 @@ public class GameWindow
 	private readonly IModule[] modules;
 	private readonly List<IUpdatableModule> updatables = [];
 	private readonly List<IRenderableModule> renderables = [];
+	private readonly List<IDisposableModule> disposables = [];
 	
 #if UseXYDebug
 	private ImGuiController imGuiController = null!;
@@ -53,6 +54,7 @@ public class GameWindow
 		window.update += Update;
 		window.render += Render;
 		window.resized += Resized;
+		window.closed += Closed;
 	}
 	
 	public bool HasModule<T>() where T : IModule => modules.Any(x => x is T);
@@ -69,15 +71,12 @@ public class GameWindow
 			try
 			{
 				module.Init();
-				switch (module)
-				{
-					case IUpdatableModule updatable:
-						updatables.Add(updatable);
-						break;
-					case IRenderableModule renderable:
-						renderables.Add(renderable);
-						break;
-				}
+				if (module is IUpdatableModule updatable)
+					updatables.Add(updatable);
+				if (module is IRenderableModule renderable)
+					renderables.Add(renderable);
+				if (module is IDisposableModule disposable)
+					disposables.Add(disposable);
 			}
 			catch (Exception e)
 			{
@@ -150,4 +149,10 @@ public class GameWindow
 	}
 	
 	private void Resized(Vector2Int size) { }
+	
+	private void Closed()
+	{
+		foreach (var module in disposables)
+			module.Dispose();
+	}
 }

@@ -11,6 +11,12 @@ public interface IModule
 }
 
 [UsedImplicitly]
+public interface IDisposableModule : IModule
+{
+	public void Dispose();
+}
+
+[UsedImplicitly]
 public interface ILoadableModule : IModule
 {
 	public Task Load();
