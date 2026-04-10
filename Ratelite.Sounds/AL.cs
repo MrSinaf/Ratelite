@@ -3,7 +3,7 @@ using static Ratelite.Sounds.Bindings.ALNative;
 
 namespace Ratelite.Sounds;
 
-public static unsafe class AL
+internal static unsafe class AL
 {
     public static void* OpenDevice()
         => alcOpenDevice(null);
@@ -29,15 +29,32 @@ public static unsafe class AL
 
     public static void DeleteSource(uint source)
         => alDeleteSources(1, &source);
-
-    public static void Source(uint source, ALSourceParam param, int value)
+    
+    public static void SetSource(uint source, ALSourceParam param, bool value)
+        => alSourcei(source, (int)param, value ? 1 : 0);
+    
+    public static void SetSource(uint source, ALSourceParam param, int value)
         => alSourcei(source, (int)param, value);
 
-    public static void Source(uint source, ALSourceParam param, float value)
+    public static void SetSource(uint source, ALSourceParam param, float value)
         => alSourcef(source, (int)param, value);
-
-    public static void Source(uint source, ALSourceParam param, float x, float y, float z)
-        => alSource3f(source, (int)param, x, y, z);
+    
+    public static void SetSource(uint source, ALSourceParam param, Vector3 value)
+        => alSource3f(source, (int)param, value.x, value.y, value.z);
+    
+    public static float GetSourceF(uint source, ALSourceParam param)
+    {
+        float value;
+        alGetSourcef(source, (int)param, &value);
+        return value;
+    }
+    
+    public static bool GetSourceB(uint source, ALSourceParam param)
+    {
+        int value;
+        alGetSourcei(source, (int)param, &value);
+        return value == 1;
+    }
     
     public static void Volume(float value)
         => alListenerf(0x100A, value);
