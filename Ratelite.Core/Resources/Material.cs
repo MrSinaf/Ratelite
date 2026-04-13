@@ -1,8 +1,8 @@
 ﻿using Ratelite.Rendering;
+using Ratelite.Utils;
 
 namespace Ratelite.Resources;
 
-// TODO > Gérer les variables par-défaut d'un shader (‾◡◝)
 public class Material : IAsset
 {
 	public readonly Dictionary<string, object> properties = [];
@@ -13,6 +13,9 @@ public class Material : IAsset
 	public Material(Shader shader, params (string, object)[] properties)
 	{
 		this.shader = shader;
+		
+		foreach (var property in shader.defaultUniforms)
+			SetProperty(property.Key, property.Value);
 		
 		foreach (var (name, value) in properties)
 			SetProperty(name, value);

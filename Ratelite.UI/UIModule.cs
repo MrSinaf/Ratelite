@@ -31,9 +31,10 @@ public class UIModule : ILoadableModule
 				DEFAULT_SHADER
 			);
 			
-			Vault.AddAsset(
-				DEFAULT_MATERIAL,
-				new MaterialUI(shader).SetTexture(Primitif.whitePixel)
+			MainThreadQueue.EnqueueRenderer(() => Vault.AddAsset(
+						DEFAULT_MATERIAL,
+						new MaterialUI(shader).SetTexture(Primitif.whitePixel)
+					)
 			);
 			
 			await Vault.LoadManifestResource<BitmapFont>(

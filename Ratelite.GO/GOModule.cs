@@ -1,4 +1,5 @@
 ﻿using Ratelite.Resources;
+using Ratelite.Utils;
 
 namespace Ratelite.GO;
 
@@ -9,10 +10,7 @@ public class GOModule : ILoadableModule
 	
 	public int priority => 15;
 	
-	public void Init()
-	{
-		
-	}
+	public void Init() { }
 	
 	public async Task Load()
 	{
@@ -24,9 +22,10 @@ public class GOModule : ILoadableModule
 				DEFAULT_SHADER
 			);
 			
-			Vault.AddAsset(
-				DEFAULT_MATERIAL,
-				new MaterialObject(shader)
+			MainThreadQueue.EnqueueRenderer(() => Vault.AddAsset(
+						DEFAULT_MATERIAL,
+						new MaterialObject(shader)
+					)
 			);
 		}
 	}

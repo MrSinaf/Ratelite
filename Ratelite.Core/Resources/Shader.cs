@@ -7,23 +7,42 @@ public class Shader : IResource<Shader>
 {
 	private const string OPENGL_VERSION = "#version 330 core";
 	
-	public GProgram gProgram = null!;
+	public GProgram gProgram { get; private set; } = null!;
+	public IReadOnlyDictionary<string, object> defaultUniforms { get; private set; } = null!;
 	
-	public Shader(string vertexShader, string fragmentShader)
+	public Shader(string vertexShader, string fragmentShader, string[]? defaultUniforms = null)
 	{
 		MainThreadQueue.EnqueueRenderer(() =>
-		{
-			gProgram = new GProgram();
-			gProgram.Compile(
-				OPENGL_VERSION + "\n" + vertexShader,
-				OPENGL_VERSION + "\n" + fragmentShader
-			);
-		});
+			{
+				gProgram = new GProgram();
+				gProgram.Compile(
+					OPENGL_VERSION + "\n" + vertexShader,
+					OPENGL_VERSION + "\n" + fragmentShader
+				);
+				
+				if (defaultUniforms != null)
+				{
+					var programUniforms = gProgram.GetUniforms();
+					var uniforms = new Dictionary<string, object>();
+					foreach (var uniform in programUniforms)
+					{
+						if (defaultUniforms.Contains(uniform.name))
+						{
+							gProgram.GetUniform(uniform.name, uniform.type, out var obj);
+							if (obj != null)
+								uniforms.Add(uniform.name, obj);
+						}
+					}
+					
+					this.defaultUniforms = uniforms;
+				}
+				else this.defaultUniforms = new Dictionary<string, object>();
+			}
+		);
 	}
 	
 	public static Shader Load(Stream stream)
 	{
-		// TODO Ajouter la gestion des variables par défaut (soit ici, soit via le material).
 		using var reader = new StreamReader(stream);
 		var shadxy = reader.ReadToEnd();
 		
@@ -39,7 +58,12 @@ public class Shader : IResource<Shader>
 		
 		vertexShader = layout + vertexShader;
 		fragmentShader = layout + fragmentShader;
-		return new Shader(vertexShader, fragmentShader);
+		
+		return new Shader(
+			vertexShader,
+			fragmentShader,
+			ShaderFactory.ExtractUniformNamesWithDefaultValue(shadxy)
+		);
 	}
 	
 	public static bool ValidateExtension(string extension)

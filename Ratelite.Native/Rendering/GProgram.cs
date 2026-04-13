@@ -102,6 +102,64 @@ public class GProgram : IDisposable
 			GL.Uniform1(location, value ? 1 : 0);
 	}
 	
+	public void GetUniform(string name, Type type, out object? obj)
+	{
+		if (type == typeof(bool))
+		{
+			GetUniform(name, out bool value);
+			obj = value;
+		}
+		else if (type == typeof(float))
+		{
+			GetUniform(name, out float value);
+			obj = value;
+		}
+		else if (type == typeof(int))
+		{
+			GetUniform(name, out int value);
+			obj = value;
+		}
+		else if (type == typeof(Vector2))
+		{
+			GetUniform(name, out Vector2 value);
+			obj = value;
+		}
+		else if (type == typeof(Vector3))
+		{
+			GetUniform(name, out Vector3 value);
+			obj = value;
+		}
+		else if (type == typeof(Vector4))
+		{
+			GetUniform(name, out Vector4 value);
+			obj = value;
+		}
+		else if (type == typeof(Region))
+		{
+			GetUniform(name, out Region value);
+			obj = value;
+		}
+		else if (type == typeof(Rect))
+		{
+			GetUniform(name, out Rect value);
+			obj = value;
+		}
+		else if (type == typeof(Matrix3X3))
+		{
+			GetUniform(name, out Matrix3X3 value);
+			obj = value;
+		}
+		else if (type == typeof(Color))
+		{
+			GetUniform(name, out Color value);
+			obj = value;
+		}
+		else
+		{
+			obj = null;
+		}
+	}
+	
 	public void GetUniform(string name, out bool value)
 	{
 		value = false;

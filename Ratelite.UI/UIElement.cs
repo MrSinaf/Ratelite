@@ -278,10 +278,6 @@ public class UIElement
 			shader.gProgram.SetUniform("u_uv", uv);
 			
 			mesh!.Draw();
-			
-			// TODO Ajouter comme élément par défaut, car le shader ne support pas pour le moment
-			// les paramètres par défaut...
-			shader.gProgram.SetUniform("u_ninepatch", new Rect());
 		}
 		
 		foreach (var child in children)

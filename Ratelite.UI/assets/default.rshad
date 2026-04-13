@@ -2,13 +2,13 @@ uniform mat3 u_model;
 uniform vec2 u_modelSize;
 
 uniform sampler2D u_texture;
-uniform vec4 u_tint = vec4(1, 1, 1, 1);
-uniform float u_opacity = 1.0;
+uniform vec4 u_tint;
+uniform float u_opacity;
 uniform vec4 u_cornerRadius;
 uniform vec4 u_uv;
 
-uniform float u_ninepatchScale;
-uniform vec4 u_ninepatch;
+uniform float u_ninepatchScale = 1;
+uniform vec4 u_ninepatch = vec4(0);
 
 // @fragment-only
 float cornerRadiusMask(vec2 fragCoord)

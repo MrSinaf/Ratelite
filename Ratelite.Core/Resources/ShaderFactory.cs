@@ -63,6 +63,16 @@ public static partial class ShaderFactory
 		return (vertexSb.ToString(), fragmentSb.ToString());
 	}
 	
+	public static string[] ExtractUniformNamesWithDefaultValue(string shadxySource)
+	{
+		var names = new List<string>();
+		
+		foreach (Match m in UniformWithDefaultRegex().Matches(shadxySource))
+			names.Add(m.Groups[1].Value);
+		
+		return names.ToArray();
+	}
+	
 	private enum Stage { Both, VertexOnly, FragmentOnly }
 	
 	private sealed record FunctionInfo(string name, string body, string globalParams, Stage stage);
@@ -174,4 +184,7 @@ public static partial class ShaderFactory
 	
 	[GeneratedRegex(@"uniform\s+.*?;")]
 	private static partial Regex UniformRegex();
+	
+	[GeneratedRegex(@"uniform\s+.*?\b(\w+)\s*=\s*.*?;")]
+	private static partial Regex UniformWithDefaultRegex();
 }

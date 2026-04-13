@@ -71,45 +71,46 @@ public class SplashWindow
 			"""
 		);
 		MainThreadQueue.EnqueueRenderer(() =>
-				shader.gProgram.SetUniform(
-					"u_projection",
-					Matrix3X3.CreateOrthographic(256, 266, false)
+		{
+			shader.gProgram.SetUniform(
+				"u_projection",
+				Matrix3X3.CreateOrthographic(256, 266, false)
+			);
+			objects.Add(
+				(
+					MeshFactory.CreateQuad(texture.size * 2, new Vector2(0, -20)),
+					new Material(
+						shader,
+						("u_texture", texture),
+						("u_tint", Color.white),
+						("u_model", Matrix3X3.Identity())
+					)
 				)
-		);
-		objects.Add(
-			(
-				MeshFactory.CreateQuad(texture.size * 2, new Vector2(0, -20)),
-				new Material(
-					shader,
-					("u_texture", texture),
-					("u_tint", Color.white),
-					("u_model", Matrix3X3.Identity())
+			);
+			objects.Add(
+				(
+					MeshFactory.CreateQuad(new Vector2(256, 20), Vector2.zero),
+					new Material(
+						shader,
+						("u_texture", new Texture2D(1, 1, [Color.white])),
+						("u_tint", Color.black),
+						("u_model", Matrix3X3.Identity())
+					)
 				)
-			)
-		);
-		objects.Add(
-			(
-				MeshFactory.CreateQuad(new Vector2(256, 20), Vector2.zero),
-				new Material(
-					shader,
-					("u_texture", new Texture2D(1, 1, [Color.white])),
-					("u_tint", Color.black),
-					("u_model", Matrix3X3.Identity())
+			);
+			objects.Add(
+				(
+					MeshFactory.CreateQuad(new Vector2(246, 10), Vector2.zero),
+					new Material(
+						shader,
+						("u_texture", new Texture2D(1, 1, [Color.white])),
+						("u_tint", new Color(0x35775C)),
+						("u_model", Matrix3X3.CreateScale(new Vector2(0.5F, 1)) *
+									Matrix3X3.CreateTranslation(new Vector2(5)))
+					)
 				)
-			)
-		);
-		objects.Add(
-			(
-				MeshFactory.CreateQuad(new Vector2(246, 10), Vector2.zero),
-				new Material(
-					shader,
-					("u_texture", new Texture2D(1, 1, [Color.white])),
-					("u_tint", new Color(0x35775C)),
-					("u_model", Matrix3X3.CreateScale(new Vector2(0.5F, 1)) *
-								Matrix3X3.CreateTranslation(new Vector2(5)))
-				)
-			)
-		);
+			);
+		});
 	}
 	
 	private void Render()
