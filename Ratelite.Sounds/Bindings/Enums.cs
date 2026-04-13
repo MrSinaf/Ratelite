@@ -27,6 +27,14 @@ public enum ALSourceParam
 	State = 0x1010,
 }
 
+public enum ALBufferParam
+{
+	Frequency = 0x2001,
+	Bits = 0x2002,
+	Channels = 0x2003,
+	Size = 0x2004
+}
+
 public enum ALError
 {
 	NoError = 0,

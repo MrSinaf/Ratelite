@@ -39,21 +39,28 @@ internal static unsafe class AL
     public static void SetSource(uint source, ALSourceParam param, float value)
         => alSourcef(source, (int)param, value);
     
-    public static void SetSource(uint source, ALSourceParam param, Vector3 value)
-        => alSource3f(source, (int)param, value.x, value.y, value.z);
-    
     public static float GetSourceF(uint source, ALSourceParam param)
     {
         float value;
         alGetSourcef(source, (int)param, &value);
         return value;
     }
-    
     public static bool GetSourceB(uint source, ALSourceParam param)
     {
         int value;
         alGetSourcei(source, (int)param, &value);
         return value == 1;
+    }
+    
+    
+    public static void SetBuffer(uint source, ALBufferParam param, int value)
+        => alBufferi(source, (int)param, value);
+    
+    public static int GetBuffer(uint buffer, ALBufferParam param)
+    {
+        int value;
+        alGetBufferi(buffer, (int)param, &value);
+        return value;
     }
     
     public static void Volume(float value)

@@ -1,4 +1,5 @@
 ﻿using Ratelite.Sounds.Bindings;
+using Ratelite.Sounds.Bindings.StbVorbis;
 using Ratelite.Utils;
 
 namespace Ratelite.Sounds;
@@ -6,6 +7,7 @@ namespace Ratelite.Sounds;
 public class AudioClip : IResource<AudioClip>
 {
 	public uint handle { get; private set; }
+	public required float duration;
 	
 	private AudioClip(byte[] bytes, ALFormat format, int dataSize, int dataOffset, int sampleRate)
 	{
@@ -24,11 +26,57 @@ public class AudioClip : IResource<AudioClip>
 		);
 	}
 	
+	private AudioClip(byte[] pcmBytes, ALFormat format, int sampleRate)
+			: this(pcmBytes, format, pcmBytes.Length, 0, sampleRate) { }
+	
 	public static AudioClip Load(VaultRessource ress)
 	{
-		// Ne support que le .wav
-		const int dataOffset = 44;
+		return ress.extension switch
+		{
+			".wav" => LoadWav(ress),
+			".ogg" => LoadOgg(ress),
+			_      => throw new Exception("Unsupported audio format (•_•)")
+		};
+	}
+	
+	private static AudioClip LoadOgg(VaultRessource ress)
+	{
+		using var ms = new MemoryStream();
+		ress.stream.CopyTo(ms);
+		var bytes = ms.ToArray();
 		
+		using var vorbis = Vorbis.FromMemory(bytes);
+		
+		var channels = vorbis.Channels;
+		var sampleRate = vorbis.SampleRate;
+		
+		var pcm = new List<short>(bytes.Length);
+		vorbis.Restart();
+		
+		while (true)
+		{
+			vorbis.SubmitBuffer();
+			if (vorbis.Decoded <= 0)
+				break;
+			
+			for (var i = 0; i < vorbis.Decoded * channels; i++)
+				pcm.Add(vorbis.SongBuffer[i]);
+		}
+		
+		var pcmShorts = pcm.ToArray();
+		var pcmBytes = new byte[pcmShorts.Length * sizeof(short)];
+		Buffer.BlockCopy(pcmShorts, 0, pcmBytes, 0, pcmBytes.Length);
+		
+		var format = channels == 1 ? ALFormat.Mono16 : ALFormat.Stereo16;
+		return new AudioClip(pcmBytes, format, sampleRate)
+		{
+			duration = pcmShorts.Length / (float)(channels * sampleRate)
+		};
+	}
+	
+	private static AudioClip LoadWav(VaultRessource ress)
+	{
+		const int dataOffset = 44;
 		using var ms = new MemoryStream();
 		ress.stream.CopyTo(ms);
 		var bytes = ms.ToArray();
@@ -42,9 +90,12 @@ public class AudioClip : IResource<AudioClip>
 				? bitDepth == 8 ? ALFormat.Mono8 : ALFormat.Mono16
 				: bitDepth == 8 ? ALFormat.Stereo8 : ALFormat.Stereo16;
 		
-		return new AudioClip(bytes, format, dataSize, dataOffset, sampleRate);
+		return new AudioClip(bytes, format, dataSize, dataOffset, sampleRate)
+		{
+			duration = dataSize / (sampleRate * channels * (bitDepth / 8f))
+		};
 	}
 	
 	public static bool ValidateExtension(string extension)
-		=> extension == ".wav";
+		=> extension is ".wav" or ".ogg";
 }
