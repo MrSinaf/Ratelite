@@ -47,9 +47,9 @@ public class Texture2D : Texture, IResource<Texture2D>, IDisposable
 		GC.SuppressFinalize(this);
 	}
 	
-	public static Texture2D Load(Stream stream)
+	public static Texture2D Load(VaultRessource ress)
 	{
-		var image = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
+		var image = ImageResult.FromStream(ress.stream, ColorComponents.RedGreenBlueAlpha);
 		return new Texture2D(image.width, image.height, Color.AsColors(image.data).ToArray());
 	}
 	

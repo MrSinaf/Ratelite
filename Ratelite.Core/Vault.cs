@@ -65,19 +65,20 @@ public static class Vault
 	}
 	
 	public static async Task<T?> LoadResource<T>(string path)
-			where T : class, IResource<T>
+			where T : class, IResourceAsync<T>
 	{
 		var fullPath = Path.Combine("assets", path);
 		if (!File.Exists(fullPath))
 			throw new FileNotFoundException($"The resource '{path}' does not exist! (￣_￣|||)");
 		
-		if (!T.ValidateExtension(Path.GetExtension(fullPath)))
+		var extension = Path.GetExtension(fullPath);
+		if (!T.ValidateExtension(extension))
 			throw new ArgumentException(
-				"Unsupported image format ⊙﹏⊙∥:" + Path.GetExtension(fullPath)
+				"Unsupported format ⊙﹏⊙∥:" + extension
 			);
 		
 		await using var stream = File.OpenRead(fullPath);
-		var asset = T.Load(stream);	// TODO > Fournir une class plus complète donnant divers infos
+		var asset = await T.LoadAsync(new VaultRessource(stream, extension));
 		return asset;
 	}
 	
@@ -101,13 +102,14 @@ public static class Vault
 		if (!File.Exists(fullPath))
 			throw new FileNotFoundException($"The resource '{path}' does not exist! (￣_￣|||)");
 		
-		if (!T.ValidateExtension(Path.GetExtension(fullPath)))
+		var extension = Path.GetExtension(fullPath);
+		if (!T.ValidateExtension(extension))
 			throw new ArgumentException(
-				"Unsupported image format ⊙﹏⊙∥:" + Path.GetExtension(fullPath)
+				"Unsupported format ⊙﹏⊙∥:" + extension
 			);
 		
 		await using var stream = File.OpenRead(fullPath);
-		var asset = T.Load(stream);
+		var asset = T.Load(new VaultRessource(stream, extension));
 		AddAsset(name, asset);
 		
 		return asset;
@@ -143,12 +145,13 @@ public static class Vault
 				"! (￣_￣|||)"
 			);
 		
-		if (!T.ValidateExtension(Path.GetExtension(path)))
+		var extension = Path.GetExtension(path);
+		if (!T.ValidateExtension(extension))
 			throw new ArgumentException(
-				"Unsupported format ⊙﹏⊙∥:" + Path.GetExtension(path)
+				"Unsupported format format ⊙﹏⊙∥:" + extension
 			);
 		
-		var asset = T.Load(stream);
+		var asset = T.Load(new VaultRessource(stream, extension));
 		
 		if (addInCache)
 			AddAsset(name, asset);
@@ -161,3 +164,5 @@ internal class AssetReference(object asset)
 {
 	public readonly object asset = asset;
 }
+
+public record class VaultRessource(Stream stream, string extension);

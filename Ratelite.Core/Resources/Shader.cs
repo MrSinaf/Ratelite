@@ -41,9 +41,9 @@ public class Shader : IResource<Shader>
 		);
 	}
 	
-	public static Shader Load(Stream stream)
+	public static Shader Load(VaultRessource ress)
 	{
-		using var reader = new StreamReader(stream);
+		using var reader = new StreamReader(ress.stream);
 		var shadxy = reader.ReadToEnd();
 		
 		var (vertexShader, fragmentShader) = ShaderFactory.Build(shadxy);

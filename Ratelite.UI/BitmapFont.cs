@@ -9,10 +9,10 @@ public class BitmapFont : IResource<BitmapFont>
 	public required MaterialUI material { get; init; }
 	public required Font data { get; init; }
 	
-	public static BitmapFont Load(Stream stream)
+	public static BitmapFont Load(VaultRessource ress)
 	{
 		using var memoryStream = new MemoryStream();
-		stream.CopyTo(memoryStream);
+		ress.stream.CopyTo(memoryStream);
 		var font = new Font(memoryStream.ToArray());
 		
 		var material = new MaterialUI();

@@ -24,13 +24,13 @@ public class AudioClip : IResource<AudioClip>
 		);
 	}
 	
-	public static AudioClip Load(Stream stream)
+	public static AudioClip Load(VaultRessource ress)
 	{
 		// Ne support que le .wav
 		const int dataOffset = 44;
 		
 		using var ms = new MemoryStream();
-		stream.CopyTo(ms);
+		ress.stream.CopyTo(ms);
 		var bytes = ms.ToArray();
 		
 		var channels = BitConverter.ToInt16(bytes, 22);
