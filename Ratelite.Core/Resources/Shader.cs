@@ -7,11 +7,16 @@ public class Shader : IResource<Shader>
 {
 	private const string OPENGL_VERSION = "#version 330 core";
 	
+	public readonly IReadOnlyDictionary<string, object> defaultUniforms;
 	public GProgram gProgram { get; private set; } = null!;
-	public IReadOnlyDictionary<string, object> defaultUniforms { get; private set; } = null!;
 	
-	public Shader(string vertexShader, string fragmentShader, string[]? defaultUniforms = null)
+	public Shader(
+		string vertexShader,
+		string fragmentShader,
+		IReadOnlyDictionary<string, object>? defaultUniforms = null
+	)
 	{
+		this.defaultUniforms = defaultUniforms ?? new Dictionary<string, object>();
 		MainThreadQueue.EnqueueRenderer(() =>
 			{
 				gProgram = new GProgram();
@@ -19,24 +24,6 @@ public class Shader : IResource<Shader>
 					OPENGL_VERSION + "\n" + vertexShader,
 					OPENGL_VERSION + "\n" + fragmentShader
 				);
-				
-				if (defaultUniforms != null)
-				{
-					var programUniforms = gProgram.GetUniforms();
-					var uniforms = new Dictionary<string, object>();
-					foreach (var uniform in programUniforms)
-					{
-						if (defaultUniforms.Contains(uniform.name))
-						{
-							gProgram.GetUniform(uniform.name, uniform.type, out var obj);
-							if (obj != null)
-								uniforms.Add(uniform.name, obj);
-						}
-					}
-					
-					this.defaultUniforms = uniforms;
-				}
-				else this.defaultUniforms = new Dictionary<string, object>();
 			}
 		);
 	}
@@ -62,7 +49,7 @@ public class Shader : IResource<Shader>
 		return new Shader(
 			vertexShader,
 			fragmentShader,
-			ShaderFactory.ExtractUniformNamesWithDefaultValue(shadxy)
+			ShaderFactory.ExtractUniformsWithDefaultValue(shadxy)
 		);
 	}
 	

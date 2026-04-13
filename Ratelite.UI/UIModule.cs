@@ -30,11 +30,9 @@ public class UIModule : ILoadableModule
 				"Ratelite.UI.assets.default.rshad",
 				DEFAULT_SHADER
 			);
-			
-			MainThreadQueue.EnqueueRenderer(() => Vault.AddAsset(
-						DEFAULT_MATERIAL,
-						new MaterialUI(shader).SetTexture(Primitif.whitePixel)
-					)
+			Vault.AddAsset(
+				DEFAULT_MATERIAL,
+				new MaterialUI(shader).SetTexture(Primitif.whitePixel)
 			);
 			
 			await Vault.LoadManifestResource<BitmapFont>(

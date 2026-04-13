@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -63,19 +64,93 @@ public static partial class ShaderFactory
 		return (vertexSb.ToString(), fragmentSb.ToString());
 	}
 	
-	public static string[] ExtractUniformNamesWithDefaultValue(string shadxySource)
+	public static Dictionary<string, object> ExtractUniformsWithDefaultValue(string shadxySource)
 	{
-		var names = new List<string>();
+		var uniforms = new Dictionary<string, object>();
 		
 		foreach (Match m in UniformWithDefaultRegex().Matches(shadxySource))
-			names.Add(m.Groups[1].Value);
+		{
+			uniforms.Add(
+				m.Groups[2].Value,
+				ConvertShaderValueToCSharp(m.Groups[1].Value, m.Groups[3].Value.Trim())
+			);
+		}
 		
-		return names.ToArray();
+		return uniforms;
 	}
 	
 	private enum Stage { Both, VertexOnly, FragmentOnly }
 	
 	private sealed record FunctionInfo(string name, string body, string globalParams, Stage stage);
+	
+	private static object ConvertShaderValueToCSharp(string type, string rawValue)
+	{
+		var valueText = rawValue.Trim();
+		
+		if (valueText.StartsWith(type + "(", StringComparison.OrdinalIgnoreCase) &&
+			valueText.EndsWith(')') || valueText.StartsWith(type + "{", StringComparison.OrdinalIgnoreCase) &&
+			valueText.EndsWith('}'))
+		{
+			valueText = valueText[(type.Length + 1)..^1];
+		}
+		
+		var parts = valueText
+					.Trim()
+					.Trim('{', '}', '(', ')')
+					.Split(
+						',',
+						StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
+					);
+		
+		switch (type)
+		{
+			case "bool":
+				return bool.Parse(valueText);
+			case "int":
+				return int.Parse(valueText, CultureInfo.InvariantCulture);
+			case "uint":
+				return uint.Parse(valueText, CultureInfo.InvariantCulture);
+			case "float":
+				return float.Parse(valueText, CultureInfo.InvariantCulture);
+			case "double":
+				return double.Parse(valueText, CultureInfo.InvariantCulture);
+			case "vec2":
+				if (parts.Length == 1)
+					return new Vector2(float.Parse(parts[0], CultureInfo.InvariantCulture));
+				
+				return new Vector2(
+					float.Parse(parts[0], CultureInfo.InvariantCulture),
+					float.Parse(parts[1], CultureInfo.InvariantCulture)
+				);
+			case "vec3":
+				if (parts.Length == 1)
+					return new Vector3(float.Parse(parts[0], CultureInfo.InvariantCulture));
+				
+				return new Vector3(
+					float.Parse(parts[0], CultureInfo.InvariantCulture),
+					float.Parse(parts[1], CultureInfo.InvariantCulture),
+					float.Parse(parts[2], CultureInfo.InvariantCulture)
+				);
+			case "vec4":
+				if (parts.Length == 1)
+				{
+					var value = float.Parse(
+						parts[0],
+						CultureInfo.InvariantCulture
+					);
+					return new Color(value, value, value, value);
+				}
+				
+				return new Color(
+					float.Parse(parts[0], CultureInfo.InvariantCulture),
+					float.Parse(parts[1], CultureInfo.InvariantCulture),
+					float.Parse(parts[2], CultureInfo.InvariantCulture),
+					float.Parse(parts[3], CultureInfo.InvariantCulture)
+				);
+			default:
+				return rawValue;
+		}
+	}
 	
 	private static List<FunctionInfo> ExtractFunctions(string src)
 	{
@@ -185,6 +260,6 @@ public static partial class ShaderFactory
 	[GeneratedRegex(@"uniform\s+.*?;")]
 	private static partial Regex UniformRegex();
 	
-	[GeneratedRegex(@"uniform\s+.*?\b(\w+)\s*=\s*.*?;")]
+	[GeneratedRegex(@"uniform\s+(\w+)\s+(\w+)\s*=\s*(.*?);")]
 	private static partial Regex UniformWithDefaultRegex();
 }

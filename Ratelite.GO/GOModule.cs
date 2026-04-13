@@ -1,5 +1,4 @@
 ﻿using Ratelite.Resources;
-using Ratelite.Utils;
 
 namespace Ratelite.GO;
 
@@ -22,11 +21,7 @@ public class GOModule : ILoadableModule
 				DEFAULT_SHADER
 			);
 			
-			MainThreadQueue.EnqueueRenderer(() => Vault.AddAsset(
-						DEFAULT_MATERIAL,
-						new MaterialObject(shader)
-					)
-			);
+			Vault.AddAsset(DEFAULT_MATERIAL, new MaterialObject(shader));
 		}
 	}
 }
