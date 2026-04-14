@@ -147,9 +147,19 @@ public class UIElement
 	
 	public Vector2 anchors { set => (anchorMin, anchorMax) = (value, value); }
 	
+	public void MoveOnTop()
+	{
+		if (parent == null)
+			return;
+		
+		parent.children.Remove(this);
+		parent.children.Add(this);
+	}
+	
 	public virtual void AddChild(UIElement element)
 	{
 		element.parent?.RemoveChild(element);
+		element.parent = this;
 		children.Add(element);
 	}
 	
@@ -206,6 +216,8 @@ public class UIElement
 	protected virtual void BeginRender() { }
 	protected virtual void EndRender() { }
 	public virtual void OnDestroy() { }
+	
+	public void ForceUpdate(UIElement parent) => InternalUpdate(parent, null);
 	
 	public void Destroy()
 	{

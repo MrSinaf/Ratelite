@@ -90,8 +90,8 @@ public class Layout : UIElement
 	
 	private void SetChild(UIElement element, int index)
 	{
-		// TODO > Il se base sur la size des UIElement, il faut plutôt gérer ça via leur realSize
-		// Faut alors pouvoir générer leur taille avant d'afficher !
+		element.ForceUpdate(this);
+		
 		var spacing = index == 0 ? 0 : this.spacing;
 		anchorMax = anchorMin;	// S'assure que les anchors sont identiques.
 		
@@ -107,7 +107,7 @@ public class Layout : UIElement
 			else
 			{
 				if (element.anchorMin != element.anchorMax)
-					element.size = new Vector2(0, element.size.y);
+					element.size = new Vector2(0, element.realSize.y);
 				
 				element.pivot = new Vector2(element.pivot.x, 0);
 				element.anchorMin = new Vector2(element.anchorMin.x, 0);
@@ -115,8 +115,8 @@ public class Layout : UIElement
 			}
 			
 			size = new Vector2(
-				size.x < element.size.x ? element.size.x : size.x,
-				size.y + element.size.y + spacing
+				size.x < element.realSize.x ? element.realSize.x : size.x,
+				size.y + element.realSize.y + spacing
 			);
 		}
 		else
@@ -131,7 +131,7 @@ public class Layout : UIElement
 			else
 			{
 				if (element.anchorMin != element.anchorMax)
-					element.size = new Vector2(element.size.x, 0);
+					element.size = new Vector2(element.realSize.x, 0);
 				
 				element.pivot = new Vector2(0, element.pivot.y);
 				element.anchorMin = new Vector2(0, element.anchorMin.y);
@@ -139,8 +139,8 @@ public class Layout : UIElement
 			}
 			
 			size = new Vector2(
-				size.x + element.size.x + spacing,
-				size.y < element.size.y ? element.size.y : size.y
+				size.x + element.realSize.x + spacing,
+				size.y < element.realSize.y ? element.realSize.y : size.y
 			);
 		}
 	}
