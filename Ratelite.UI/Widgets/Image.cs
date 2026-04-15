@@ -4,7 +4,11 @@ namespace Ratelite.UI.Widgets;
 
 public class Image : UIElement
 {
-	public Texture2D texture;
+	public Texture2D? texture
+	{
+		get => material.GetProperty<Texture2D>(MaterialUI.TEXTURE);
+		set => material.SetTexture(value);
+	}
 	
 	public Image(Texture2D texture, MaterialUI material, string? prefab = "")
 	{
@@ -12,7 +16,6 @@ public class Image : UIElement
 		base.material = material;
 		this.texture = texture;
 		
-		material.SetTexture(texture);
 		UIPrefab.Apply(prefab, this);
 	}
 	
@@ -20,6 +23,12 @@ public class Image : UIElement
 		texture,
 		new MaterialUI()
 	) { }
+	
+	public Image()
+	{
+		base.mesh = Vault.GetAsset<Mesh>(UIModule.DEFAULT_MESH);
+		base.material = new MaterialUI();
+	}
 	
 	[IsDefaultPrefab]
 	public static void DefaultPrefrab(Image e)

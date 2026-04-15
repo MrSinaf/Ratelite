@@ -16,6 +16,7 @@ public class ElementButton : UIElement
 		base.AddChild(this.element = element);
 		this.onClick += onClick;
 		
+		element.isInteractif = false;
 		R.game.window.mouseButtonPressed += OnMouseButtonPressed;
 		R.game.window.mouseButtonReleased += OnMouseButtonReleased;
 		UIPrefab.Apply(prefab, this);

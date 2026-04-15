@@ -25,7 +25,7 @@ public class MaterialUI(Shader? shader = null, params (string, object)[] propert
 		set => SetProperty(NINEPATCH_SCALE, value);
 	}
 	
-	public MaterialUI SetTexture(Texture2D texture)
+	public MaterialUI SetTexture(Texture2D? texture)
 	{
 		SetProperty(TEXTURE, texture);
 		return this;
