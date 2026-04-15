@@ -2,52 +2,16 @@
 
 namespace Ratelite.UI.Widgets;
 
-public class Button : UIElement
+public class Button : ElementButton
 {
 	public readonly Label label;
-	public bool isPressed { get; private set; }
-	
 	public string text { get => label.text; set => label.text = value; }
 	
-	public event Action onClick = delegate { };
-	public event Action<UIElement> onPressed = delegate { };
-	public event Action<UIElement> onReleased = delegate { };
-	
-	public Button(string text, Action? onClick, string? prefab = "")
+	public Button(string text, Action? onClick, string? prefab = "") :
+			base(new Label(text), onClick, null)
 	{
-		base.AddChild(label = new Label(text));
-		this.onClick += onClick;
-		
-		R.game.window.mouseButtonPressed += OnMouseButtonPressed;
-		R.game.window.mouseButtonReleased += OnMouseButtonReleased;
+		label = (Label)element;
 		UIPrefab.Apply(prefab, this);
-	}
-	
-	private void OnMouseButtonPressed(MouseButton button)
-	{
-		if (button == MouseButton.Left && isCursorOver)
-		{
-			isPressed = true;
-			onPressed(this);
-		}
-	}
-	
-	private void OnMouseButtonReleased(MouseButton button)
-	{
-		if (button == MouseButton.Left && isPressed)
-		{
-			isPressed = false;
-			onReleased(this);
-			
-			if (isCursorOver)
-				onClick.Invoke();
-		}
-	}
-	
-	public override void OnDestroy()
-	{
-		R.game.window.mouseButtonPressed -= OnMouseButtonPressed;
-		R.game.window.mouseButtonReleased -= OnMouseButtonReleased;
 	}
 	
 	[IsDefaultPrefab]
@@ -59,7 +23,7 @@ public class Button : UIElement
 		e.tint = new Color(0x26354A);
 		e.cornerRadius = new Region(8);
 		
-		e.label.pivot = e.label.anchors = new Vector2(0.5F);
+		e.label.pivotAndAnchors = new Vector2(0.5F);
 		
 		e.cursorEnter += OnMouseEnter;
 		e.cursorExit += OnMouseExit;
