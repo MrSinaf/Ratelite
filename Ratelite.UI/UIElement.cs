@@ -146,6 +146,7 @@ public class UIElement
 	protected Vector2 meshOffset = Vector2.zero;
 	
 	public Vector2 anchors { set => (anchorMin, anchorMax) = (value, value); }
+	public Vector2 pivotAndAnchors { set => (pivot, anchors) = (value, value); }
 	
 	public void MoveOnTop()
 	{

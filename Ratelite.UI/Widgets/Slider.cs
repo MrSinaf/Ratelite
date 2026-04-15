@@ -39,7 +39,7 @@ public class Slider : UIElement
 	{
 		this.onCursorChanged = onCursorChanged;
 		this.orientation = orientation;
-		base.AddChild(cursor = new UIElement());
+		base.AddChild(cursor = new UIElement { isInteractif = false });
 		
 		Window.current.mouseButtonPressed += OnMouseButtonPressed;
 		Window.current.mouseButtonReleased += OnMouseButtonReleased;
@@ -105,7 +105,7 @@ public class Slider : UIElement
 			}
 			else if (isCursorOver)
 			{
-				cursorPosition = Window.current.cursorPosition.x - realPosition.x - 
+				cursorPosition = Window.current.cursorPosition.x - realPosition.x -
 								 cursor.realSize.x * 0.5F;
 				CursorPositionUpdated();
 				lastCursorPosition = Window.current.cursorPosition - cursor.position;
