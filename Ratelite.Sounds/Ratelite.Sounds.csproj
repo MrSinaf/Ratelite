@@ -24,6 +24,8 @@
               PackagePath="/icon.png"
               Visible="false"
               Pack="true"/>
+        <None Include="assets\deps\win-x64\soft_oal.dll"
+              PackagePath="runtimes/win-x64/native/" Pack="true"/>
         
       <ProjectReference Include="..\Ratelite.Core\Ratelite.Core.csproj" />
     </ItemGroup>
