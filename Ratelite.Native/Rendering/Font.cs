@@ -43,6 +43,41 @@ public unsafe class Font
 		baseLine = (int)(-face->size->metrics.descender.Value.ToInt64() / 64);
 	}
 	
+	
+	public float CalculTextSize(string text)
+	{
+		if (text.Length == 0)
+			return 0f;
+		
+		var maxWidth = 0f;
+		var currentWidth = 0f;
+		
+		foreach (var c in text)
+		{
+			if (c == '\n')
+			{
+				if (currentWidth > maxWidth)
+					maxWidth = currentWidth;
+				
+				currentWidth = 0f;
+				continue;
+			}
+			
+			if (!glyphs.TryGetValue(c, out var glyph))
+			{
+				if (!glyphs.TryGetValue('?', out glyph))
+					continue;
+			}
+			
+			currentWidth += glyph.advance;
+		}
+		
+		if (currentWidth > maxWidth)
+			maxWidth = currentWidth;
+		
+		return maxWidth;
+	}
+	
 	public Color[] GetBitmap()
 	{
 		glyphs.Clear();
