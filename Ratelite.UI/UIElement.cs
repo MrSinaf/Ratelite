@@ -14,7 +14,8 @@ public class UIElement
 	public UIElement[] childrenArray => children.ToArray();
 	
 	public bool isActif => active;
-	public bool canDraw => isObservable && material is not null && mesh is { isValid: true };
+	public bool canDraw => isObservable && visible &&
+						   material is not null && mesh is { isValid: true };
 	public bool isObservable => clipArea.size != Vector2Int.zero;
 	
 	public event Action<UIElement> cursorEnter = delegate { };
@@ -33,6 +34,7 @@ public class UIElement
 	public virtual bool active { get; set; } = true;
 	public bool captureCursorEvent { get; set; } = true;
 	public bool isInteractif { get; set; } = true;
+	public bool visible { get; set; } = true;
 	
 	public virtual Mesh? mesh { get; set; }
 	public virtual MaterialUI? material { get; set; }
