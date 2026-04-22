@@ -3,11 +3,16 @@
 public static class Stage
 {
 	public static Scene current { get; private set; } = new ();
+	public static Scene loadingScene = new ();
 	
-	public static async Task Load(Scene scene)
+	public static void Load(Scene scene)
 	{
-		current.InternalUnload();
-		current = scene;
-		await scene.Load();
+		current = loadingScene;
+		Task.Run(async () =>
+			{
+				current.InternalUnload();
+				await scene.Load();
+			}
+		).ContinueWith(_ => current = scene);
 	}
 }

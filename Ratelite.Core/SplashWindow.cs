@@ -183,7 +183,7 @@ public class SplashWindow
 		
 		try
 		{
-			await Stage.Load(
+			Stage.Load(
 				(Scene)Activator.CreateInstance(config.startingScene ?? typeof(Scene))!
 			);
 		}
