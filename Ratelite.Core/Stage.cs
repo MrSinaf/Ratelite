@@ -7,10 +7,11 @@ public static class Stage
 	
 	public static void Load(Scene scene)
 	{
+		var oldScene = current;
 		current = loadingScene;
 		Task.Run(async () =>
 			{
-				current.InternalUnload();
+				oldScene.InternalUnload();
 				await scene.Load();
 			}
 		).ContinueWith(_ => current = scene);
