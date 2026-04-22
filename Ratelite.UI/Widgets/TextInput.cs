@@ -8,6 +8,12 @@ public class TextInput : UIElement
 	public readonly Label placeholderLabel;
 	public readonly Label valueLabel;
 	
+	public readonly UIElement caret;
+	
+	private CancellationTokenSource cancellationBlinks = new ();
+	
+	public event Action<string> onValueChanged = delegate { };
+	
 	public string placeholder
 	{
 		get => placeholderLabel.text;
@@ -31,6 +37,7 @@ public class TextInput : UIElement
 			}
 			
 			valueLabel.text = value;
+			onValueChanged(value);
 		}
 	}
 	
@@ -48,12 +55,32 @@ public class TextInput : UIElement
 			{
 				w.charTyped += OnCharTyped;
 				w.keyPressed += OnKeyPressed;
+				
+				cancellationBlinks = new CancellationTokenSource();
+				BlinksCaret(cancellationBlinks.Token);
 			}
 			else
 			{
 				w.charTyped -= OnCharTyped;
 				w.keyPressed -= OnKeyPressed;
+				
+				caret.visible = false;
+				cancellationBlinks.Cancel();
 			}
+		}
+	}
+	
+	public int caretPosition
+	{
+		get;
+		private set
+		{
+			field = value;
+			caret.visible = true;
+			cancellationBlinks.Cancel();
+			cancellationBlinks = new CancellationTokenSource();
+			BlinksCaret(cancellationBlinks.Token);
+			caret.position = new Vector2(valueLabel.font.CalculTextSize(this.value[..field]).x, 0);
 		}
 	}
 	
@@ -65,8 +92,9 @@ public class TextInput : UIElement
 		{
 			anchorMin = Vector2.zero, anchorMax = Vector2.one, isInteractif = false
 		};
-		mask.AddChild(placeholderLabel = new Label());
-		mask.AddChild(valueLabel = new Label());
+		mask.AddChild(placeholderLabel = new Label { name = "placeholder" });
+		mask.AddChild(valueLabel = new Label { name = "value" });
+		valueLabel.AddChild(caret = new UIElement { name = "caret", visible = false });
 		base.AddChild(mask);
 		
 		var w = Window.current;
@@ -85,16 +113,51 @@ public class TextInput : UIElement
 	
 	private void UpdateLabelPosition()
 	{
-		var parentSize = valueLabel.parent.realSize.x;
-		var textSize = valueLabel.font.CalculTextSize(value);
-		valueLabel.position = textSize > parentSize
-				? new Vector2(-textSize + parentSize, 0)
-				: Vector2.zero;
+		var parentWidth = valueLabel.parent.realSize.x;
+		var textWidth = valueLabel.font.CalculTextSize(value).x;
+		
+		if (textWidth <= parentWidth)
+		{
+			valueLabel.position = Vector2.zero;
+			return;
+		}
+		
+		var visibleWidth = parentWidth - caret.size.x;
+		var currentOffset = valueLabel.position.x;
+		var caretX = caret.position.x + currentOffset;
+		
+		if (caretX > visibleWidth)
+			currentOffset -= caretX - visibleWidth;
+		else if (caretX < 0)
+			currentOffset -= caretX;
+		var minOffset = visibleWidth - textWidth;
+		if (currentOffset < minOffset)
+			currentOffset = minOffset;
+		if (currentOffset > 0)
+			currentOffset = 0;
+		
+		valueLabel.position = new Vector2(currentOffset, 0);
+	}
+	
+	private async void BlinksCaret(CancellationToken token)
+	{
+		try
+		{
+			while (!token.IsCancellationRequested)
+			{
+				caret.visible = true;
+				await Task.Delay(500, token);
+				caret.visible = false;
+				await Task.Delay(500, token);
+			}
+		}
+		catch { }
 	}
 	
 	private void OnCharTyped(char c)
 	{
-		value += c;
+		value = value.Insert(caretPosition, c.ToString());
+		caretPosition++;
 		UpdateLabelPosition();
 	}
 	
@@ -104,7 +167,22 @@ public class TextInput : UIElement
 		{
 			case Key.Backspace:
 				if (value.Length > 0)
-					value = value.Remove(value.Length - 1, 1);
+				{
+					value = value.Remove(caretPosition - 1, 1);
+					caretPosition--;
+				}
+				break;
+			case Key.Delete:
+				if (value.Length >= caretPosition + 1)
+					value = value.Remove(caretPosition, 1);
+				break;
+			case Key.Left:
+				if (caretPosition > 0)
+					caretPosition--;
+				break;
+			case Key.Right:
+				if (value.Length > caretPosition)
+					caretPosition++;
 				break;
 		}
 		UpdateLabelPosition();
@@ -116,8 +194,12 @@ public class TextInput : UIElement
 			return;
 		
 		mousePressed = true;
+		caretPosition = valueLabel.font.GetIndexCharInPosition(
+			value,
+			Window.current.cursorPosition.x - valueLabel.realPosition.x
+		);
+		UpdateLabelPosition();
 	}
-	
 	
 	private void OnMouseButtonReleased(MouseButton button)
 	{
@@ -135,6 +217,13 @@ public class TextInput : UIElement
 		e.size = new Vector2(200, 30);
 		e.mesh = Vault.GetAsset<Mesh>(UIModule.DEFAULT_MESH);
 		e.material = Vault.GetAsset<MaterialUI>(UIModule.DEFAULT_MATERIAL);
+		
+		e.caret.mesh = Vault.GetAsset<Mesh>(UIModule.DEFAULT_MESH);
+		e.caret.material = Vault.GetAsset<MaterialUI>(UIModule.DEFAULT_MATERIAL);
+		e.caret.size = new Vector2Int(2, 0);
+		e.caret.anchorMin = Vector2.zero;
+		e.caret.anchorMax = Vector2.top;
+		e.caret.overflowHidden = false;
 		
 		e.placeholderLabel.opacity = 0.5F;
 		

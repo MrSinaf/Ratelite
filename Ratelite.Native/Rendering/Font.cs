@@ -43,14 +43,15 @@ public unsafe class Font
 		baseLine = (int)(-face->size->metrics.descender.Value.ToInt64() / 64);
 	}
 	
-	
-	public float CalculTextSize(string text)
+	public Vector2 CalculTextSize(string text)
 	{
-		if (text.Length == 0)
-			return 0f;
+		var textSize = Vector2.zero;
+		if (string.IsNullOrEmpty(text))
+			return textSize;
 		
 		var maxWidth = 0f;
 		var currentWidth = 0f;
+		var lineCount = 1;
 		
 		foreach (var c in text)
 		{
@@ -60,14 +61,13 @@ public unsafe class Font
 					maxWidth = currentWidth;
 				
 				currentWidth = 0f;
+				lineCount++;
 				continue;
 			}
 			
 			if (!glyphs.TryGetValue(c, out var glyph))
-			{
 				if (!glyphs.TryGetValue('?', out glyph))
 					continue;
-			}
 			
 			currentWidth += glyph.advance;
 		}
@@ -75,7 +75,33 @@ public unsafe class Font
 		if (currentWidth > maxWidth)
 			maxWidth = currentWidth;
 		
-		return maxWidth;
+		textSize.x = maxWidth;
+		textSize.y = lineCount * pixelSize;
+		
+		return textSize;
+	}
+	
+	public int GetIndexCharInPosition(string text, float x)
+	{
+		if (string.IsNullOrEmpty(text))
+			return 0;
+		
+		var currentWidth = 0f;
+		for (var i = 0; i < text.Length; i++)
+		{
+			var c = text[i];
+			
+			if (!glyphs.TryGetValue(c, out var glyph))
+				if (!glyphs.TryGetValue('?', out glyph))
+					continue;
+			
+			currentWidth += glyph.advance;
+			
+			if (currentWidth > x)
+				return i;
+		}
+		
+		return text.Length;
 	}
 	
 	public Color[] GetBitmap()
