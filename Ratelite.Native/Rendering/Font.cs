@@ -7,26 +7,25 @@ public unsafe class Font
 {
 	private static readonly FT ft = new (Platform.Windows);
 	
+	public readonly Dictionary<char, Glyph> glyphs = [];
+	public readonly int baseLine;
+	
+	private readonly FT_FaceRec_* face;
+	
+	public readonly uint pixelSize;
 	public Color[]? colors;
 	public Vector2Int size;
-	public Dictionary<char, Glyph> glyphs = [];
-	public uint pixelSize => 18;
-	public int baseLine;
 	
-	private readonly byte[] bytes;
-	private FT_FaceRec_* face;
-	private FT_LibraryRec_* library;
-	
-	public Font(byte[] bytes)
+	public Font(byte[] bytes, Vector2Int size, uint pixelSize)
 	{
-		this.bytes = bytes;
-		
+		this.size = size;
+		this.pixelSize = pixelSize;
 		var fontBytesHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
 		
-		fixed (FT_LibraryRec_** fixedLibrary = &library)
 		fixed (FT_FaceRec_** fixedFace = &face)
 		{
-			ft.FT_Init_FreeType(fixedLibrary);
+			FT_LibraryRec_* library;
+			ft.FT_Init_FreeType(&library);
 			var pBytes = (byte*)fontBytesHandle.AddrOfPinnedObject();
 			
 			ft.FT_New_Memory_Face(
@@ -107,8 +106,6 @@ public unsafe class Font
 	public Color[] GetBitmap()
 	{
 		glyphs.Clear();
-		
-		size = new Vector2Int(528);
 		colors = new Color[size.x * size.y];
 		var texel = 1 / size.ToVector2();
 		
@@ -129,7 +126,6 @@ public unsafe class Font
 			var bitmap = face->glyph->bitmap;
 			var metrics = face->glyph->metrics;
 			
-			// Retour à la ligne si dépassement en X
 			if (cursorX + bitmap.width + padding > size.x)
 			{
 				cursorX = 0;
@@ -137,7 +133,6 @@ public unsafe class Font
 				rowH = 0;
 			}
 			
-			// Sécurité si dépassement en Y (atlas trop petit)
 			if (cursorY + bitmap.rows + padding > size.y)
 				break;
 			
@@ -173,7 +168,6 @@ public unsafe class Font
 				)
 			);
 			
-			// Avance le curseur pour le prochain glyph
 			cursorX += (int)bitmap.width + padding;
 			if (bitmap.rows > rowH) rowH = (int)bitmap.rows;
 		}

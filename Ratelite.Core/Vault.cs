@@ -64,7 +64,7 @@ public static class Vault
 		return false;
 	}
 	
-	public static async Task<T?> LoadResource<T>(string path)
+	public static async Task<T?> LoadResource<T>(string path, IResourceConfig? config = null)
 			where T : class, IResourceAsync<T>
 	{
 		var fullPath = Path.Combine("assets", path);
@@ -78,11 +78,15 @@ public static class Vault
 			);
 		
 		await using var stream = File.OpenRead(fullPath);
-		var asset = await T.LoadAsync(new VaultRessource(stream, extension));
+		var asset = await T.LoadAsync(new VaultRessource(stream, extension, config));
 		return asset;
 	}
 	
-	public static async Task<T?> LoadResource<T>(string path, string name)
+	public static async Task<T?> LoadResource<T>(
+		string path,
+		string name,
+		IResourceConfig? config = null
+	)
 			where T : class, IResource<T>
 	{
 		if (assets.TryGetValue(name, out var reference))
@@ -109,7 +113,7 @@ public static class Vault
 			);
 		
 		await using var stream = File.OpenRead(fullPath);
-		var asset = T.Load(new VaultRessource(stream, extension));
+		var asset = T.Load(new VaultRessource(stream, extension, config));
 		AddAsset(name, asset);
 		
 		return asset;
@@ -119,6 +123,7 @@ public static class Vault
 		Assembly assembly,
 		string path,
 		string name,
+		IResourceConfig? config = null,
 		bool addInCache = true
 	) where T : class, IResource<T>
 	{
@@ -151,7 +156,7 @@ public static class Vault
 				"Unsupported format format ⊙﹏⊙∥:" + extension
 			);
 		
-		var asset = T.Load(new VaultRessource(stream, extension));
+		var asset = T.Load(new VaultRessource(stream, extension, config));
 		
 		if (addInCache)
 			AddAsset(name, asset);
@@ -165,4 +170,6 @@ internal class AssetReference(object asset)
 	public readonly object asset = asset;
 }
 
-public record class VaultRessource(Stream stream, string extension);
+public interface IResourceConfig;
+
+public record class VaultRessource(Stream stream, string extension, IResourceConfig? config);
