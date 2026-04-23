@@ -6,7 +6,7 @@ namespace Ratelite.UI;
 
 public class BitmapFont : IResource<BitmapFont>
 {
-	public static readonly Config internalConfig = new (new Vector2Int(512), 18);
+	public static readonly Config internalConfig = new (new Vector2Int(256), 18);
 	public static Config defaultConfig = internalConfig;
 	
 	public required MaterialUI material { get; init; }
@@ -21,20 +21,27 @@ public class BitmapFont : IResource<BitmapFont>
 		using var memoryStream = new MemoryStream();
 		ress.stream.CopyTo(memoryStream);
 		
-		var font = new Font(memoryStream.ToArray(), config.textureSize, config.fontSize);
+		var font = new Font(
+			memoryStream.ToArray(),
+			config.textureSize,
+			config.fontSize,
+			config.baselineOffset
+		);
 		var material = new MaterialUI();
 		font.GetBitmap();
 		var texture = new Texture2D(font.size.x, font.size.y, font.colors!);
 		material.SetTexture(texture);
 		
 		MainThreadQueue.EnqueueRenderer(() =>
-		{
-			texture.SetFilter(TextureMin.Linear, TextureMag.Linear);
-			texture.SetWrap(TextureWrap.ClampToEdge);
-			texture.gTexture.GenerateMipmap();
-		});
+			{
+				texture.SetFilter(TextureMin.Linear, TextureMag.Linear);
+				texture.SetWrap(TextureWrap.ClampToEdge);
+				texture.gTexture.GenerateMipmap();
+			}
+		);
 		
-		return new BitmapFont {
+		return new BitmapFont
+		{
 			data = font,
 			material = material
 		};
@@ -43,5 +50,6 @@ public class BitmapFont : IResource<BitmapFont>
 	public static bool ValidateExtension(string extension)
 		=> extension is ".ttf";
 	
-	public record class Config(Vector2Int textureSize, uint fontSize) : IResourceConfig;
+	public record class Config(Vector2Int textureSize, uint fontSize, int baselineOffset = 0)
+			: IResourceConfig;
 }

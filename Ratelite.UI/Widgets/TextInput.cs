@@ -212,11 +212,12 @@ public class TextInput : UIElement
 	[IsDefaultPrefab]
 	public static void DefaultPrefrab(TextInput e)
 	{
-		e.tint = new Color(0x26354A);
+		e.tint = new Color(0x1D2939);
 		e.padding = new Region(2);
 		e.size = new Vector2(200, 30);
 		e.mesh = Vault.GetAsset<Mesh>(UIModule.DEFAULT_MESH);
 		e.material = Vault.GetAsset<MaterialUI>(UIModule.DEFAULT_MATERIAL);
+		e.cornerRadius = new Region(5);
 		
 		e.caret.mesh = Vault.GetAsset<Mesh>(UIModule.DEFAULT_MESH);
 		e.caret.material = Vault.GetAsset<MaterialUI>(UIModule.DEFAULT_MATERIAL);

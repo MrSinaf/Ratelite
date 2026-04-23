@@ -16,7 +16,7 @@ public unsafe class Font
 	public Color[]? colors;
 	public Vector2Int size;
 	
-	public Font(byte[] bytes, Vector2Int size, uint pixelSize)
+	public Font(byte[] bytes, Vector2Int size, uint pixelSize, int baselineOffset)
 	{
 		this.size = size;
 		this.pixelSize = pixelSize;
@@ -39,7 +39,7 @@ public unsafe class Font
 		
 		ft.FT_Set_Pixel_Sizes(face, 0, pixelSize);
 		
-		baseLine = (int)(-face->size->metrics.descender.Value.ToInt64() / 64);
+		baseLine = (int)(-face->size->metrics.descender.Value.ToInt64() / 64) + baselineOffset;
 	}
 	
 	public Vector2 CalculTextSize(string text)
