@@ -80,7 +80,7 @@ public class TextInput : UIElement
 			cancellationBlinks.Cancel();
 			cancellationBlinks = new CancellationTokenSource();
 			BlinksCaret(cancellationBlinks.Token);
-			caret.position = new Vector2(valueLabel.font.CalculTextSize(this.value[..field]).x, 0);
+			caret.position = new Vector2(valueLabel.font!.CalculTextSize(this.value[..field]).x, 0);
 		}
 	}
 	
@@ -113,8 +113,8 @@ public class TextInput : UIElement
 	
 	private void UpdateLabelPosition()
 	{
-		var parentWidth = valueLabel.parent.realSize.x;
-		var textWidth = valueLabel.font.CalculTextSize(value).x;
+		var parentWidth = valueLabel.parent!.realSize.x;
+		var textWidth = valueLabel.font!.CalculTextSize(value).x;
 		
 		if (textWidth <= parentWidth)
 		{
@@ -194,7 +194,7 @@ public class TextInput : UIElement
 			return;
 		
 		mousePressed = true;
-		caretPosition = valueLabel.font.GetIndexCharInPosition(
+		caretPosition = valueLabel.font!.GetIndexCharInPosition(
 			value,
 			Window.current.cursorPosition.x - valueLabel.realPosition.x
 		);

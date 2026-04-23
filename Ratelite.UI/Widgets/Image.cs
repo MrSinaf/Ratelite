@@ -6,8 +6,8 @@ public class Image : UIElement
 {
 	public Texture2D? texture
 	{
-		get => material.GetProperty<Texture2D>(MaterialUI.TEXTURE);
-		set => material.SetTexture(value);
+		get => material?.GetProperty<Texture2D>(MaterialUI.TEXTURE);
+		set => material?.SetTexture(value);
 	}
 	
 	public Image(Texture2D texture, MaterialUI material, string? prefab = "")
@@ -33,6 +33,6 @@ public class Image : UIElement
 	[IsDefaultPrefab]
 	public static void DefaultPrefrab(Image e)
 	{
-		e.size = e.texture.size;
+		e.size = e.texture?.size ?? new Vector2(10);
 	}
 }

@@ -44,11 +44,8 @@ internal unsafe class Vorbis : IDisposable
 	
 	public void Dispose()
 	{
-		if (StbVorbis != null)
-		{
-			vorbis_deinit(StbVorbis);
-			StbVorbis = null;
-		}
+		vorbis_deinit(StbVorbis);
+		GC.SuppressFinalize(this);
 	}
 	
 	~Vorbis()

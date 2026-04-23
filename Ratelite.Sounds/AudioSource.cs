@@ -15,7 +15,7 @@ public class AudioSource : IDisposable
 		set
 		{
 			field = value;
-			AL.SetSource(handle, ALSourceParam.Buffer, (int)audio.handle);
+			AL.SetSource(handle, ALSourceParam.Buffer, (int)audio!.handle);
 		}
 	}
 	public float volume

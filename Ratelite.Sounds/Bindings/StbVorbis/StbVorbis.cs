@@ -5,7 +5,7 @@ namespace Ratelite.Sounds.Bindings.StbVorbis;
 
 internal static unsafe partial class StbVorbis
 {
-	public static sbyte[,] channelPosition =
+	public static readonly sbyte[,] channelPosition =
 	{
 		{ 0, 0, 0, 0, 0, 0 },
 		{ 2 | 4 | 1, 0, 0, 0, 0, 0 },
@@ -21,7 +21,7 @@ internal static unsafe partial class StbVorbis
 	public static short[] DecodeVorbisFromMemory(byte[] input, out int sampleRate, out int chan)
 	{
 		short* result = null;
-		var length = 0;
+		int length;
 		fixed (byte* b = input)
 		{
 			int c, s;
@@ -56,7 +56,7 @@ internal static unsafe partial class StbVorbis
 		public byte classifications;
 		public uint end;
 		public uint partSize;
-		public short[,] residueBooks;
+		public short[,] residueBooks = null!;
 	}
 	
 	public class stb_vorbis
@@ -76,7 +76,7 @@ internal static unsafe partial class StbVorbis
 		public int channels;
 		public int codebook_count;
 		public Ratelite.Sounds.Bindings.StbVorbis.StbVorbis.Codebook* codebooks;
-		public string[] comment_list;
+		public string[] comment_list = null!;
 		public uint current_loc;
 		public int current_loc_valid;
 		public int discard_samples_deferred;
@@ -113,17 +113,14 @@ internal static unsafe partial class StbVorbis
 		public float*[] previous_window = new float*[16];
 		internal ArrayBuffer2D<IntPtr> PtrBuffer2D = new (8, 256);
 		public byte push_mode;
-		public Residue[] residue_config;
+		public Residue[] residue_config = null!;
 		public int residue_count;
 		public ushort[] residue_types = new ushort[64];
 		public uint sample_rate;
 		public uint samples_output;
-		public Ratelite.Sounds.Bindings.StbVorbis.StbVorbis.CRCscan[] scan =
-				new Ratelite.Sounds.Bindings.StbVorbis.StbVorbis.CRCscan[4];
+		public CRCscan[] scan = new CRCscan[4];
 		public int segment_count;
 		public byte[] segments = new byte[255];
-		public uint serial;
-		public int setup_offset;
 		public byte* stream;
 		public byte* stream_end;
 		public uint stream_len;
@@ -131,7 +128,7 @@ internal static unsafe partial class StbVorbis
 		public int temp_offset;
 		public uint total_samples;
 		public int valid_bits;
-		public string vendor;
+		public string vendor = string.Empty;
 		public float*[] window = new float*[2];
 	}
 	
