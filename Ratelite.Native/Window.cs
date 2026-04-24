@@ -209,6 +209,20 @@ public sealed unsafe class Window
 	public void SetPosition(int x, int y)
 		=> glfwSetWindowPos(handle, x, y);
 	
+	public string? GetClipboardText()
+	{
+		var ptr = glfwGetClipboardString(current.handle);
+		return ptr == null ? null : Marshal.PtrToStringUTF8((nint)ptr);
+	}
+	
+	public void SetClipboardText(string text)
+	{
+		fixed (byte* utf8 = Encoding.UTF8.GetBytes(text + "\0"))
+		{
+			glfwSetClipboardString(current.handle, (sbyte*)utf8);
+		}
+	}
+	
 	public void Center()
 	{
 		var monitor = glfwGetPrimaryMonitor();

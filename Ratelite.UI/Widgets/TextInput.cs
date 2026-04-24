@@ -11,6 +11,7 @@ public class TextInput : UIElement
 	public readonly UIElement caret;
 	
 	private CancellationTokenSource cancellationBlinks = new ();
+	private bool ctrlHold;
 	
 	public event Action<string> onValueChanged = delegate { };
 	
@@ -55,6 +56,7 @@ public class TextInput : UIElement
 			{
 				w.charTyped += OnCharTyped;
 				w.keyPressed += OnKeyPressed;
+				w.keyReleased += OnKeyReleased;
 				
 				cancellationBlinks = new CancellationTokenSource();
 				BlinksCaret(cancellationBlinks.Token);
@@ -63,6 +65,7 @@ public class TextInput : UIElement
 			{
 				w.charTyped -= OnCharTyped;
 				w.keyPressed -= OnKeyPressed;
+				w.keyReleased -= OnKeyReleased;
 				
 				caret.visible = false;
 				cancellationBlinks.Cancel();
@@ -156,6 +159,9 @@ public class TextInput : UIElement
 	
 	private void OnCharTyped(char c)
 	{
+		if (ctrlHold)
+			return;
+		
 		value = value.Insert(caretPosition, c.ToString());
 		caretPosition++;
 		UpdateLabelPosition();
@@ -184,8 +190,22 @@ public class TextInput : UIElement
 				if (value.Length > caretPosition)
 					caretPosition++;
 				break;
+			case Key.LeftCtrl:
+				ctrlHold = true;
+				break;
+			case Key.V when ctrlHold:
+				value = value.Insert(
+					caretPosition,
+					Window.current.GetClipboardText() ?? string.Empty
+				);
+				break;
 		}
 		UpdateLabelPosition();
+	}
+	
+	private void OnKeyReleased(Key key, int _)
+	{
+		ctrlHold = key switch { Key.LeftCtrl => false, _ => ctrlHold };
 	}
 	
 	private void OnMouseButtonPressed(MouseButton button)
