@@ -2,13 +2,16 @@ using Ratelite.Resources;
 
 namespace Ratelite.UI.Widgets;
 
-// TODO > Compléter cette class avec divers action et SURTOUT ajout un 'caret' (/≧▽≦)/
 public class TextInput : UIElement
 {
 	public readonly Label placeholderLabel;
 	public readonly Label valueLabel;
 	
 	public readonly UIElement caret;
+	public readonly UIElement selection;
+	
+	public HashSet<char>? charsAutorized;
+	public uint maxLenght;
 	
 	private CancellationTokenSource cancellationBlinks = new ();
 	private bool ctrlHold;
@@ -37,6 +40,7 @@ public class TextInput : UIElement
 				placeholderLabel.visible = false;
 			}
 			
+			selection.visible = false;
 			valueLabel.text = value;
 			onValueChanged(value);
 		}
@@ -83,21 +87,29 @@ public class TextInput : UIElement
 			cancellationBlinks.Cancel();
 			cancellationBlinks = new CancellationTokenSource();
 			BlinksCaret(cancellationBlinks.Token);
-			caret.position = new Vector2(valueLabel.font!.CalculTextSize(this.value[..field]).x, 0);
+			caret.position = new Vector2(
+				valueLabel.font!.CalculTextSize(this.value[..field]).x,
+				0
+			);
 		}
 	}
 	
-	private bool mousePressed;
+	public int selectionStart { get; private set; }
 	
 	public TextInput(string? prefab = "")
 	{
 		var mask = new Mask
 		{
-			anchorMin = Vector2.zero, anchorMax = Vector2.one, isInteractif = false
+			anchorMin = Vector2.zero, anchorMax = Vector2.one
 		};
 		mask.AddChild(placeholderLabel = new Label { name = "placeholder" });
 		mask.AddChild(valueLabel = new Label { name = "value" });
-		valueLabel.AddChild(caret = new UIElement { name = "caret", visible = false });
+		valueLabel.AddChild(
+			caret = new UIElement { name = "caret", visible = false, isInteractif = false }
+		);
+		valueLabel.AddChild(
+			selection = new UIElement { name = "selection", visible = false, isInteractif = false }
+		);
 		base.AddChild(mask);
 		
 		var w = Window.current;
@@ -142,6 +154,17 @@ public class TextInput : UIElement
 		valueLabel.position = new Vector2(currentOffset, 0);
 	}
 	
+	private void UpdateSelectionPosition()
+	{
+		var font = valueLabel.font!;
+		var min = int.Min(selectionStart, caretPosition);
+		var max = int.Max(selectionStart, caretPosition);
+		var minTextSize = font.CalculTextSize(value[..min]).x;
+		var maxTextSize = font.CalculTextSize(value[..max]).x;
+		selection.position = new Vector2(minTextSize, 0);
+		selection.size = new Vector2(maxTextSize - minTextSize, 0);
+	}
+	
 	private async void BlinksCaret(CancellationToken token)
 	{
 		try
@@ -159,11 +182,22 @@ public class TextInput : UIElement
 	
 	private void OnCharTyped(char c)
 	{
-		if (ctrlHold)
+		if (ctrlHold || charsAutorized?.Contains(c) == true ||
+			(maxLenght > 0 && value.Length >= maxLenght))
 			return;
 		
-		value = value.Insert(caretPosition, c.ToString());
-		caretPosition++;
+		if (caretPosition == selectionStart)
+		{
+			value = value.Insert(caretPosition, c.ToString());
+			selectionStart = ++caretPosition;
+		}
+		else
+		{
+			var min = int.Min(caretPosition, selectionStart);
+			value = value.Remove(min, int.Max(caretPosition, selectionStart) - min);
+			value = value.Insert(min, c.ToString());
+			selectionStart = caretPosition = ++min;
+		}
 		UpdateLabelPosition();
 	}
 	
@@ -174,21 +208,47 @@ public class TextInput : UIElement
 			case Key.Backspace:
 				if (value.Length > 0)
 				{
-					value = value.Remove(caretPosition - 1, 1);
-					caretPosition--;
+					if (caretPosition == selectionStart)
+					{
+						value = value.Remove(caretPosition - 1, 1);
+						selectionStart = --caretPosition;
+					}
+					else
+					{
+						var min = int.Min(caretPosition, selectionStart);
+						value = value.Remove(min, int.Max(caretPosition, selectionStart) - min);
+						selectionStart = caretPosition = min;
+					}
 				}
 				break;
 			case Key.Delete:
 				if (value.Length >= caretPosition + 1)
-					value = value.Remove(caretPosition, 1);
+				{
+					if (selectionStart == caretPosition)
+					{
+						value = value.Remove(caretPosition, 1);
+					}
+					else
+					{
+						var min = int.Min(caretPosition, selectionStart);
+						value = value.Remove(min, int.Max(caretPosition, selectionStart) - min);
+						selectionStart = caretPosition = min;
+					}
+				}
 				break;
 			case Key.Left:
 				if (caretPosition > 0)
-					caretPosition--;
+				{
+					selectionStart = --caretPosition;
+					selection.visible = false;
+				}
 				break;
 			case Key.Right:
 				if (value.Length > caretPosition)
-					caretPosition++;
+				{
+					selectionStart = ++caretPosition;
+					selection.visible = false;
+				}
 				break;
 			case Key.LeftCtrl:
 				ctrlHold = true;
@@ -213,8 +273,9 @@ public class TextInput : UIElement
 		if (button != MouseButton.Left || !(focus = isCursorOver))
 			return;
 		
-		mousePressed = true;
-		caretPosition = valueLabel.font!.GetIndexCharInPosition(
+		Window.current.cursorMoved += OnCursorMoved;
+		selection.visible = false;
+		selectionStart = caretPosition = valueLabel.font!.GetIndexCharInPosition(
 			value,
 			Window.current.cursorPosition.x - valueLabel.realPosition.x
 		);
@@ -226,7 +287,20 @@ public class TextInput : UIElement
 		if (button != MouseButton.Left)
 			return;
 		
-		mousePressed = false;
+		Window.current.cursorMoved -= OnCursorMoved;
+	}
+	
+	private void OnCursorMoved(Vector2 _)
+	{
+		caretPosition = valueLabel.font!.GetIndexCharInPosition(
+			value,
+			Window.current.cursorPosition.x - valueLabel.realPosition.x
+		);
+		selection.visible = true;
+		
+		UpdateSelectionPosition();
+		UpdateLabelPosition();
+		selection.visible = selectionStart != caretPosition;
 	}
 	
 	[IsDefaultPrefab]
@@ -241,10 +315,16 @@ public class TextInput : UIElement
 		
 		e.caret.mesh = Vault.GetAsset<Mesh>(UIModule.DEFAULT_MESH);
 		e.caret.material = Vault.GetAsset<MaterialUI>(UIModule.DEFAULT_MATERIAL);
-		e.caret.size = new Vector2Int(2, 0);
+		e.caret.size = new Vector2(2, 0);
 		e.caret.anchorMin = Vector2.zero;
 		e.caret.anchorMax = Vector2.top;
 		e.caret.overflowHidden = false;
+		
+		e.selection.mesh = Vault.GetAsset<Mesh>(UIModule.DEFAULT_MESH);
+		e.selection.material = Vault.GetAsset<MaterialUI>(UIModule.DEFAULT_MATERIAL);
+		e.selection.opacity = 0.2F;
+		e.selection.anchorMin = Vector2.zero;
+		e.selection.anchorMax = Vector2.top;
 		
 		e.placeholderLabel.opacity = 0.5F;
 		
