@@ -7,6 +7,9 @@ public class Mask : UIElement
 	private readonly Stack<Mask> masks = [];
 	public bool masked = true;
 	
+	public Mask()
+		=> isInteractif = false;
+	
 	protected override void BeginRender()
 	{
 		masks.Push(this);

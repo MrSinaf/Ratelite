@@ -47,6 +47,11 @@ public class Label : UIElement
 			GenerateMeshes();
 	}
 	
+	/*
+	 * TODO > Corriger la position (ㆆ_ㆆ)
+	 * Actuellement comme le mesh est déplacé légèrement en hauteur ça rend la position réel de
+	 * l'élément plus bas que prévu.
+	 */
 	private void GenerateMeshes()
 	{
 		if (font == null)
