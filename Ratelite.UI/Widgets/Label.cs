@@ -3,6 +3,8 @@ using Ratelite.Utils;
 
 namespace Ratelite.UI.Widgets;
 
+public enum Transform { Normal, Upper, Lower }
+
 public class Label : UIElement
 {
 	public string text
@@ -13,7 +15,7 @@ public class Label : UIElement
 			if (field == value)
 				return;
 			
-			field = value;
+			field = ApplyTextTransform(value);
 			isDirtyText = true;
 		}
 	} = string.Empty;
@@ -29,6 +31,19 @@ public class Label : UIElement
 			isDirtyText = true;
 		}
 	}
+	public Transform transform
+	{
+		get;
+		set
+		{
+			if (field == value)
+				return;
+			
+			field = value;
+			text = ApplyTextTransform(text);
+			isDirtyText = true;
+		}
+	} = Transform.Normal;
 	
 	private bool isDirtyText;
 	
@@ -46,6 +61,14 @@ public class Label : UIElement
 		if (isDirtyText)
 			GenerateMeshes();
 	}
+	
+	private string ApplyTextTransform(string value) => transform switch
+	{
+		Transform.Normal => value,
+		Transform.Upper  => value.ToUpper(),
+		Transform.Lower  => value.ToLower(),
+		_                => throw new ArgumentOutOfRangeException()
+	};
 	
 	/*
 	 * TODO > Corriger la position (ㆆ_ㆆ)
