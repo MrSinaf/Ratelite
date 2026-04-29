@@ -25,6 +25,10 @@ public enum ALSourceParam
 	Looping = 0x1007,
 	Buffer = 0x1009,
 	State = 0x1010,
+	
+	SecOffset = 0x1024,
+	SampleOffset = 0x1025,
+	ByteOffset = 0x1026
 }
 
 public enum ALBufferParam

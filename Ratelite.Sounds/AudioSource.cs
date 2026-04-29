@@ -8,6 +8,11 @@ public class AudioSource : IDisposable
 	private bool isDisposed;
 	
 	public bool isPlaying => AL.GetSourceState(handle) == ALSourceState.Playing;
+	public float offset
+	{
+		get => AL.GetSourceF(handle, ALSourceParam.SecOffset);
+		set => AL.SetSource(handle, ALSourceParam.SecOffset, value);
+	}
 	
 	public AudioClip? audio
 	{
