@@ -7,6 +7,7 @@ namespace Ratelite;
 
 public class SplashWindow
 {
+	public readonly RConfig config;
 	internal readonly Window window;
 	private readonly List<(Mesh mesh, Material material)> objects = [];
 	
@@ -14,7 +15,6 @@ public class SplashWindow
 	
 	private float progress;
 	private float currentProgress;
-	private RConfig config;
 	
 	public SplashWindow(RConfig config)
 	{
@@ -115,6 +115,7 @@ public class SplashWindow
 	
 	private void Render()
 	{
+		MainThreadQueue.ExecuteAll();
 		MainThreadQueue.ExecuteAllRenderer();
 		currentProgress = float.Lerp(currentProgress, progress, Time.delta * 15);
 		objects[2].material.SetProperty(
@@ -133,7 +134,6 @@ public class SplashWindow
 	public void Destroy()
 	{
 		window.Destroy();
-		config = null!;
 	}
 	
 	private async Task Loading()
@@ -181,20 +181,20 @@ public class SplashWindow
 			await Task.Delay(-1);
 		}
 		
-		try
-		{
-			Stage.Load(
-				(Scene)Activator.CreateInstance(config.startingScene ?? typeof(Scene))!
-			);
-		}
-		catch (Exception e)
-		{
-			Log.Write(
-				$"Failed to load the starting scene ( ˘︹˘ ): {config.startingScene}\n{e.Message}",
-				Log.Level.Error
-			);
-			throw;
-		}
+		// try
+		// {
+		// 	Stage.Load(
+		// 		(Scene)Activator.CreateInstance(config.startingScene ?? typeof(Scene))!
+		// 	);
+		// }
+		// catch (Exception e)
+		// {
+		// 	Log.Write(
+		// 		$"Failed to load the starting scene ( ˘︹˘ ): {config.startingScene}\n{e.Message}",
+		// 		Log.Level.Error
+		// 	);
+		// 	throw;
+		// }
 		await Task.Delay(1000);
 		isLoaded = true;
 	}

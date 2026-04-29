@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Ratelite.Rendering;
+using Ratelite.Utils;
 
 namespace Ratelite;
 
@@ -38,6 +39,11 @@ public static class R
 		{
 			game = new GameWindow(config, splash);
 			splash.Destroy();
+			MainThreadQueue.Enqueue(() =>
+					Stage.Load(
+						(Scene)Activator.CreateInstance(config.startingScene ?? typeof(Scene))!
+					)
+			);
 			game.window.Run();
 		}
 	}

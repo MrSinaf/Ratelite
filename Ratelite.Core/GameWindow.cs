@@ -12,10 +12,6 @@ public class GameWindow
 	private readonly List<IRenderableModule> renderables = [];
 	private readonly List<IDisposableModule> disposables = [];
 	
-#if UseXYDebug
-	private ImGuiController imGuiController = null!;
-#endif
-	
 	public Color windowColor
 	{
 		get;
@@ -23,9 +19,6 @@ public class GameWindow
 		{
 			field = value;
 			window.SetWindowColor(field);
-#if UseXYDebug
-			XYDebug.mainMenuBarColor = field;
-#endif
 		}
 	}
 	
@@ -83,13 +76,6 @@ public class GameWindow
 				Log.Write($"Error intializing module (ㆆ_ㆆ) : {module.GetType().Name}", e);
 			}
 		}
-#if UseXYDebug
-		imGuiController = new ImGuiController(window);
-		Log.Write(
-			"Dear ImGui initialized! ヾ(•ω•`)o\n	Press 'F1' to open the main bar.",
-			Log.Level.Info
-		);
-#endif
 	}
 	
 	private void Update()
@@ -110,9 +96,6 @@ public class GameWindow
 		{
 			Stage.current.InternalUpdate();
 			MainThreadQueue.ExecuteAll();
-#if UseXYDebug
-			imGuiController.Update();
-#endif
 		}
 		catch (Exception e)
 		{
@@ -122,6 +105,16 @@ public class GameWindow
 	
 	private void Render()
 	{
+		try
+		{
+			Stage.current.InternalRender();
+			MainThreadQueue.ExecuteAllRenderer();
+		}
+		catch (Exception e)
+		{
+			Log.Write("Render error ＼（〇_ｏ）／", e);
+		}
+		
 		foreach (var module in renderables)
 		{
 			try
@@ -132,19 +125,6 @@ public class GameWindow
 			{
 				Log.Write($"Render error in {module.GetType().Name}", e);
 			}
-		}
-		
-		try
-		{
-			Stage.current.InternalRender();
-			MainThreadQueue.ExecuteAllRenderer();
-#if UseXYDebug
-			imGuiController.Render();
-#endif
-		}
-		catch (Exception e)
-		{
-			Log.Write("Render error ＼（〇_ｏ）／", e);
 		}
 	}
 	
