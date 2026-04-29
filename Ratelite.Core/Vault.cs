@@ -64,7 +64,7 @@ public static class Vault
 		return false;
 	}
 	
-	public static async Task<T?> LoadResource<T>(string path, IResourceConfig? config = null)
+	public static async Task<T?> LoadAsyncResource<T>(string path, IResourceConfig? config = null)
 			where T : class, IResourceAsync<T>
 	{
 		var fullPath = Path.Combine("assets", path);
@@ -82,7 +82,62 @@ public static class Vault
 		return asset;
 	}
 	
-	public static async Task<T?> LoadResource<T>(
+	public static T LoadResource<T>(string path, IResourceConfig? config = null)
+			where T : class, IResourceAsync<T>
+	{
+		var fullPath = Path.Combine("assets", path);
+		if (!File.Exists(fullPath))
+			throw new FileNotFoundException($"The resource '{path}' does not exist! (￣_￣|||)");
+		
+		var extension = Path.GetExtension(fullPath);
+		if (!T.ValidateExtension(extension))
+			throw new ArgumentException(
+				"Unsupported format ⊙﹏⊙∥:" + extension
+			);
+		
+		using var stream = File.OpenRead(fullPath);
+		var asset = T.Load(new VaultRessource(stream, extension, config));
+		return asset;
+	}
+	
+	public static async Task<T?> LoadAsyncResource<T>(
+		string path,
+		string name,
+		IResourceConfig? config = null
+	)
+			where T : class, IResourceAsync<T>
+	{
+		if (assets.TryGetValue(name, out var reference))
+		{
+			Log.Write(
+				$"You are trying to add asset `{name}`, but it's already present in the cache " +
+				$"(*/ω＼*)!",
+				Log.Level.Warning
+			);
+			if (reference.asset is T refAsset)
+				return refAsset;
+			
+			return null;
+		}
+		
+		var fullPath = Path.Combine("assets", path);
+		if (!File.Exists(fullPath))
+			throw new FileNotFoundException($"The resource '{path}' does not exist! (￣_￣|||)");
+		
+		var extension = Path.GetExtension(fullPath);
+		if (!T.ValidateExtension(extension))
+			throw new ArgumentException(
+				"Unsupported format ⊙﹏⊙∥:" + extension
+			);
+		
+		await using var stream = File.OpenRead(fullPath);
+		var asset = await T.LoadAsync(new VaultRessource(stream, extension, config));
+		AddAsset(name, asset);
+		
+		return asset;
+	}
+	
+	public static T? LoadResource<T>(
 		string path,
 		string name,
 		IResourceConfig? config = null
@@ -112,7 +167,7 @@ public static class Vault
 				"Unsupported format ⊙﹏⊙∥:" + extension
 			);
 		
-		await using var stream = File.OpenRead(fullPath);
+		using var stream = File.OpenRead(fullPath);
 		var asset = T.Load(new VaultRessource(stream, extension, config));
 		AddAsset(name, asset);
 		

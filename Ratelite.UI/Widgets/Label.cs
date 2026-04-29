@@ -52,6 +52,7 @@ public class Label : UIElement
 		if (text != null)
 			this.text = text;
 		
+		useMeshBoundsSize = false;
 		captureCursorEvent = false;
 		UIPrefab.Apply(prefab, this);
 	}
@@ -122,6 +123,5 @@ public class Label : UIElement
 		var font = Vault.GetAsset<BitmapFont>(UIModule.DEFAULT_FONT)!;
 		e.font = font.data;
 		e.material = font.material;
-		e.useMeshBoundsSize = false;
 	}
 }

@@ -21,4 +21,14 @@ public static class MainThreadQueue
 		while (commandsRenderer.TryDequeue(out var command))
 			command();
 	}
+	
+	public static Task Wait()
+	{
+		var completion = new TaskCompletionSource(
+			TaskCreationOptions.RunContinuationsAsynchronously
+		);
+		
+		Enqueue(completion.SetResult);
+		return completion.Task;
+	}
 }

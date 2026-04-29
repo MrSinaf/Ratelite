@@ -4,7 +4,7 @@ using Ratelite.Utils;
 
 namespace Ratelite.UI;
 
-public class BitmapFont : IResource<BitmapFont>
+public class BitmapFont : IResourceAsync<BitmapFont>
 {
 	public static readonly Config internalConfig = new (new Vector2Int(256), 18);
 	public static Config defaultConfig = internalConfig;
@@ -39,6 +39,42 @@ public class BitmapFont : IResource<BitmapFont>
 				texture.gTexture.GenerateMipmap();
 			}
 		);
+		
+		return new BitmapFont
+		{
+			data = font,
+			material = material
+		};
+	}
+	
+	public static async Task<BitmapFont> LoadAsync(VaultRessource ress)
+	{
+		var config = defaultConfig;
+		if (ress.config is Config c)
+			config = c;
+		
+		using var memoryStream = new MemoryStream();
+		await ress.stream.CopyToAsync(memoryStream);
+		
+		var font = new Font(
+			memoryStream.ToArray(),
+			config.textureSize,
+			config.fontSize,
+			config.baselineOffset
+		);
+		var material = new MaterialUI();
+		font.GetBitmap();
+		var texture = new Texture2D(font.size.x, font.size.y, font.colors!);
+		material.SetTexture(texture);
+		
+		MainThreadQueue.EnqueueRenderer(() =>
+			{
+				texture.SetFilter(TextureMin.Linear, TextureMag.Linear);
+				texture.SetWrap(TextureWrap.ClampToEdge);
+				texture.gTexture.GenerateMipmap();
+			}
+		);
+		await MainThreadQueue.Wait();
 		
 		return new BitmapFont
 		{

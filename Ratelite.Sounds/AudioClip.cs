@@ -4,7 +4,7 @@ using Ratelite.Utils;
 
 namespace Ratelite.Sounds;
 
-public class AudioClip : IResource<AudioClip>
+public class AudioClip : IResourceAsync<AudioClip>
 {
 	public uint handle { get; private set; }
 	public required float duration;
@@ -29,14 +29,22 @@ public class AudioClip : IResource<AudioClip>
 	private AudioClip(byte[] pcmBytes, ALFormat format, int sampleRate)
 			: this(pcmBytes, format, pcmBytes.Length, 0, sampleRate) { }
 	
-	public static AudioClip Load(VaultRessource ress)
+	/*
+		TODO > Comme nous ne sommes normalement pas en ASYNC il serait peut-être mieux de gérer le
+		cas où il n'est pas nécessaire de l'écuter dans le MainThreadQueue
+	*/
+	public static AudioClip Load(VaultRessource ress) => ress.extension switch
 	{
-		return ress.extension switch
-		{
-			".wav" => LoadWav(ress),
-			".ogg" => LoadOgg(ress),
-			_      => throw new Exception("Unsupported audio format (•_•)")
-		};
+		".wav" => LoadWav(ress),
+		".ogg" => LoadOgg(ress),
+		_      => throw new Exception("Unsupported audio format (•_•)")
+	};
+	
+	public static async Task<AudioClip> LoadAsync(VaultRessource ress)
+	{
+		var audio = Load(ress);
+		await MainThreadQueue.Wait();
+		return audio;
 	}
 	
 	private static AudioClip LoadOgg(VaultRessource ress)

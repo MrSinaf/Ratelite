@@ -4,7 +4,7 @@ using Ratelite.Utils;
 
 namespace Ratelite.Resources;
 
-public class Texture2D : Texture, IResource<Texture2D>, IDisposable
+public class Texture2D : Texture, IResourceAsync<Texture2D>, IDisposable
 {
 	public readonly Color[] pixels;
 	
@@ -52,6 +52,9 @@ public class Texture2D : Texture, IResource<Texture2D>, IDisposable
 		var image = ImageResult.FromStream(ress.stream, ColorComponents.RedGreenBlueAlpha);
 		return new Texture2D(image.width, image.height, Color.AsColors(image.data).ToArray());
 	}
+	
+	public static Task<Texture2D> LoadAsync(VaultRessource ress)
+		=> Task.FromResult(Load(ress));
 	
 	public static bool ValidateExtension(string extension) 
 		=> extension is ".png" or ".jpg" or ".jpeg";
