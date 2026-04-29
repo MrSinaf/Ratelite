@@ -26,6 +26,7 @@ public class Canvas : IPlugin
 		root.InternalUpdate(tree, stackElementHover);
 		
 		var newElementsHovered = new HashSet<UIElement>();
+		var elementsEnter = new HashSet<UIElement>();
 		while (stackElementHover.TryPop(out var e))
 		{
 			if (!e.isInteractif)
@@ -35,8 +36,7 @@ public class Canvas : IPlugin
 			previousElementsHovered.Remove(e);
 			
 			newElementsHovered.Add(e);
-			if (!inPrevious)
-				e.OnCursorEnter();
+			if (!inPrevious) elementsEnter.Add(e);
 			
 			if (e.captureCursorEvent)
 				break;
@@ -44,6 +44,9 @@ public class Canvas : IPlugin
 		
 		foreach (var e in previousElementsHovered)
 			e.OnCursorExit();
+		
+		foreach (var e in elementsEnter)
+			e.OnCursorEnter();
 		
 		stackElementHover.Clear();
 		previousElementsHovered = newElementsHovered;
