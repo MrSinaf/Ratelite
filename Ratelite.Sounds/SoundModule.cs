@@ -1,6 +1,8 @@
-﻿namespace Ratelite.Sounds;
+﻿using Ratelite.Utils;
 
-public unsafe class SoundModule : IDisposableModule
+namespace Ratelite.Sounds;
+
+public unsafe class SoundModule : ILoadableModule, IDisposableModule
 {
 	public int priority => 0;
 	
@@ -9,11 +11,19 @@ public unsafe class SoundModule : IDisposableModule
 	
 	public void Init()
 	{
-		device  = AL.OpenDevice();
-		context = AL.CreateContext(device);
-		AL.MakeContextCurrent(context);
+	}
+	
+	public Task Load()
+	{
+		MainThreadQueue.Enqueue(() =>
+		{
+			device  = AL.OpenDevice();
+			context = AL.CreateContext(device);
+			AL.MakeContextCurrent(context);
+		});
 		
-		
+		MainThreadQueue.Wait().Wait();
+		return Task.CompletedTask;
 	}
 	
 	public void Dispose()
