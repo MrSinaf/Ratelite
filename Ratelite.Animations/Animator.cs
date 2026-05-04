@@ -3,7 +3,7 @@ namespace Ratelite.Animations;
 public class Animator<T>
 {
 	public AnimationController<T> controller { get; private set; }
-	public AnimationBlock<T> animationBlock { get; private set; }
+	public AnimationBlock<T>? animationBlock { get; private set; }
 	
 	public float currentTime { get; private set; }
 	public bool isRunning { get; private set; }

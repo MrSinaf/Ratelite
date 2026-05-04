@@ -3,16 +3,17 @@ namespace Ratelite.Animations;
 public class AnimationController<T> : IAsset
 {
 	private readonly Dictionary<string, AnimationBlock<T>> blocks = [];
-	public AnimationBlock<T> firstBlock;
+	public AnimationBlock<T>? firstBlock;
 	
-	public void AddBlock(string name, Animation<T> animation, Action<Animator<T>, T> onUpdate = null)
+	public void AddBlock(string name, Animation<T> animation, Action<Animator<T>, T>? onUpdate = 
+			null)
 	{
 		var newBlock = new AnimationBlock<T>(name, animation, onUpdate ?? delegate { });
 		blocks[name] = newBlock;
 		firstBlock ??= newBlock;
 	}
 	
-	public AnimationBlock<T> GetBlock(string name) => blocks.TryGetValue(name, out var block) ? block : null;
+	public AnimationBlock<T>? GetBlock(string name) => blocks.GetValueOrDefault(name);
 	
 	public void Destroy() => blocks.Clear();
 }

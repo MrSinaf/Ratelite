@@ -41,7 +41,8 @@ public class AnimationTrack<T1, T> : IAnimationTrack<T1>
 		if (targetTime < keyFrames[currentIndex].time)
 			currentIndex = 0;
 		
-		while (currentIndex < keyFrames.Length - 1 && keyFrames[currentIndex + 1].time <= targetTime)
+		while (currentIndex < keyFrames.Length - 1 &&
+			   keyFrames[currentIndex + 1].time <= targetTime)
 			currentIndex++;
 		
 		if (currentIndex == keyFrames.Length - 1)
@@ -52,10 +53,16 @@ public class AnimationTrack<T1, T> : IAnimationTrack<T1>
 		
 		var currentFrame = keyFrames[currentIndex];
 		var nextFrame = keyFrames[currentIndex + 1];
-		applyProperty(obj, currentFrame.lerp
-						  ? Lerp(currentFrame.value, nextFrame.value,
-								 (targetTime - currentFrame.time) / (nextFrame.time - currentFrame.time))
-						  : currentFrame.value);
+		applyProperty(
+			obj,
+			currentFrame.lerp
+					? Lerp(
+						currentFrame.value,
+						nextFrame.value,
+						(targetTime - currentFrame.time) / (nextFrame.time - currentFrame.time)
+					)
+					: currentFrame.value
+		);
 	}
 	
 	void IAnimationTrack<T1>.Reset() => currentIndex = 0;
@@ -65,11 +72,14 @@ public class AnimationTrack<T1, T> : IAnimationTrack<T1>
 		if (start is ILerpable<T> lerpable)
 			return lerpable.Lerp(end, t);
 		if (typeof(T) == typeof(float))
-			return (T)(object)((float)(object)start * (1 - t) + (float)(object)end * t);
+			return (T)(object)((float)(object)start! * (1 - t) + (float)(object)end! * t);
 		if (typeof(T) == typeof(double))
-			return (T)(object)((double)(object)start * (1 - t) + (double)(object)end * t);
+			return (T)(object)((double)(object)start! * (1 - t) + (double)(object)end! * t);
 		if (typeof(T) == typeof(int))
-			return (T)(object)(int)Math.Round((int)(object)start * (1 - t) + (int)(object)end * t);
+			return (T)(object)(int)Math.Round(
+				(int)(object)start! * (1 - t) + (int)(object)end! *
+				t
+			);
 		
 		return start;
 	}

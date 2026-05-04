@@ -18,6 +18,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <None Include="..\Ratelite.Core\assets\textures\icon-r.png"
+              PackagePath="/icon.png"
+              Visible="false"
+              Pack="true"/>
       <ProjectReference Include="..\Ratelite.Core\Ratelite.Core.csproj" />
     </ItemGroup>
 
