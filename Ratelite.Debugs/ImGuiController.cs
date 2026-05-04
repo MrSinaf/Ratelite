@@ -45,17 +45,7 @@ public class ImGuiController
 		window.charTyped += OnCharTyped;
 	}
 	
-	public void Render()
-	{
-		if (frameBegun)
-		{
-			frameBegun = false;
-			ImGui.Render();
-			RenderImDrawData(ImGui.GetDrawData());
-		}
-	}
-	
-	public void Update()
+	public void BeginRender()
 	{
 		if (frameBegun)
 			ImGui.Render();
@@ -63,6 +53,16 @@ public class ImGuiController
 		SetPerFrameImGuiData(Time.delta);
 		frameBegun = true;
 		ImGui.NewFrame();
+	}
+	
+	public void EndRender()
+	{
+		if (frameBegun)
+		{
+			frameBegun = false;
+			ImGui.Render();
+			RenderImDrawData(ImGui.GetDrawData());
+		}
 	}
 	
 	private unsafe void RenderImDrawData(ImDrawDataPtr drawDataPtr)
@@ -420,7 +420,9 @@ public class ImGuiController
 		io.Fonts.Clear();
 		using var memoryStream = new MemoryStream();
 		GetType().Assembly
-				 .GetManifestResourceStream("Ratelite.Debugs.assets.fonts.compliance-sans.ttf")
+				 .GetManifestResourceStream(
+					 "Ratelite.Debugs.assets.fonts.sarasa-mono-cl--semi-bold.ttf"
+				 )
 				 .CopyTo(memoryStream);
 		var fontBytes = memoryStream.ToArray();
 		
@@ -428,7 +430,26 @@ public class ImGuiController
 		{
 			fixed (byte* pFont = fontBytes)
 			{
-				io.Fonts.AddFontFromMemoryTTF((IntPtr)pFont, fontBytes.Length, 14f);
+				ushort[] glyphRanges =
+				[
+					0x0020, 0x00FF, 0x0100, 0x017F, 0x0180, 0x024F, 0x0250, 0x02AF, 0x02B0, 0x02FF,
+					0x0300, 0x036F, 0x2000, 0x206F, 0x2070, 0x209F, 0x20A0, 0x20CF, 0x2100, 0x214F,
+					0x2190, 0x21FF, 0x2200, 0x22FF, 0x2300, 0x23FF, 0x2460, 0x24FF, 0x2500, 0x257F,
+					0x2580, 0x259F, 0x25A0, 0x25FF, 0x2600, 0x26FF, 0x2700, 0x27BF, 0x3000, 0x303F,
+					0x3040, 0x309F, 0x30A0, 0x30FF, 0x3100, 0x312F, 0x31F0, 0x31FF, 0xFF00, 0xFFEF,
+					0xFE10, 0xFE1F, 0xFE30, 0xFE4F, 0xFE50, 0xFE6F, 0x3000, 0x303F, 0x2500, 0x257F,
+					0xFF00, 0xFFEF, 0
+				];
+				fixed (ushort* pGlyphRanges = glyphRanges)
+				{
+					io.Fonts.AddFontFromMemoryTTF(
+						(IntPtr)pFont,
+						fontBytes.Length,
+						14f,
+						null,
+						(IntPtr)pGlyphRanges
+					);
+				}
 			}
 		}
 		

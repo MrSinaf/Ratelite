@@ -1,6 +1,6 @@
 ﻿namespace Ratelite.Debugs;
 
-public class DebugModule : IRenderableModule, IUpdatableModule
+public class DebugModule : IRenderablePhaseModule, IRenderableModule
 {
 	public int priority => int.MinValue;
 	
@@ -11,13 +11,18 @@ public class DebugModule : IRenderableModule, IUpdatableModule
 		controller = new ImGuiController(R.game.window);
 	}
 	
-	public void Update()
+	public void BeginRender()
 	{
-		controller.Update();
+		controller.BeginRender();
 	}
 	
 	public void Render()
 	{
-		controller.Render();
+		RDebug.Render();
+	}
+	
+	public void EndRender()
+	{
+		controller.EndRender();
 	}
 }
