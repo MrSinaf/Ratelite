@@ -29,16 +29,14 @@ public class BitmapFont : IResourceAsync<BitmapFont>
 		);
 		var material = new MaterialUI();
 		font.GetBitmap();
-		var texture = new Texture2D(font.size.x, font.size.y, font.colors!);
-		material.SetTexture(texture);
-		
-		MainThreadQueue.EnqueueRenderer(() =>
-			{
-				texture.SetFilter(TextureMin.Linear, TextureMag.Linear);
-				texture.SetWrap(TextureWrap.ClampToEdge);
-				texture.gTexture.GenerateMipmap();
-			}
+		var texture = new Texture2D(
+			font.size.x,
+			font.size.y,
+			font.colors!,
+			new Texture2D.Config(TextureMin.Linear, TextureMag.Linear, TextureWrap.ClampToEdge)
 		);
+		material.SetTexture(texture);
+		MainThreadQueue.EnqueueRenderer(() => texture.gTexture.GenerateMipmap());
 		
 		return new BitmapFont
 		{
@@ -64,16 +62,15 @@ public class BitmapFont : IResourceAsync<BitmapFont>
 		);
 		var material = new MaterialUI();
 		font.GetBitmap();
-		var texture = new Texture2D(font.size.x, font.size.y, font.colors!);
+		var texture = new Texture2D(
+			font.size.x,
+			font.size.y,
+			font.colors!,
+			new Texture2D.Config(TextureMin.Linear, TextureMag.Linear, TextureWrap.ClampToEdge)
+		);
 		material.SetTexture(texture);
 		
-		MainThreadQueue.EnqueueRenderer(() =>
-			{
-				texture.SetFilter(TextureMin.Linear, TextureMag.Linear);
-				texture.SetWrap(TextureWrap.ClampToEdge);
-				texture.gTexture.GenerateMipmap();
-			}
-		);
+		MainThreadQueue.EnqueueRenderer(() => texture.gTexture.GenerateMipmap());
 		await MainThreadQueue.Wait();
 		
 		return new BitmapFont

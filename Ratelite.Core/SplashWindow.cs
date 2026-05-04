@@ -45,7 +45,8 @@ public class SplashWindow
 		var texture = new Texture2D(
 			image.size.x,
 			image.size.y,
-			Color.AsColors(image.pixels).ToArray()
+			Color.AsColors(image.pixels).ToArray(),
+			Texture2D.internalConfig
 		);
 		var shader = new Shader(
 			"""
@@ -92,7 +93,7 @@ public class SplashWindow
 						MeshFactory.CreateQuad(new Vector2(256, 20), Vector2.zero),
 						new Material(
 							shader,
-							("u_texture", new Texture2D(1, 1, [Color.white])),
+							("u_texture", Primitif.whitePixel),
 							("u_tint", Color.black),
 							("u_model", Matrix3X3.Identity())
 						)
@@ -103,7 +104,7 @@ public class SplashWindow
 						MeshFactory.CreateQuad(new Vector2(246, 10), Vector2.zero),
 						new Material(
 							shader,
-							("u_texture", new Texture2D(1, 1, [Color.white])),
+							("u_texture", Primitif.whitePixel),
 							("u_tint", new Color(0x35775C)),
 							("u_model", Matrix3X3.CreateScale(new Vector2(0.5F, 1)) *
 										Matrix3X3.CreateTranslation(new Vector2(5)))
