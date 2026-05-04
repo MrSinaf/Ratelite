@@ -9,6 +9,9 @@ public class RenderTexture : Texture
 	public uint width { get; set; }
 	public uint height { get; set; }
 	public Vector2 texel { get; private set; }
+	public Color clearColor = R.game.backgroundColor;
+	
+	private Color previousClearColor;
 	
 	private readonly uint frameBufferHandle;
 	private readonly uint rbHandle;
@@ -20,7 +23,10 @@ public class RenderTexture : Texture
 		size = new Vector2Int((int)width, (int)height);
 		texel = Vector2.one / size;
 		
+		gTexture = new GTexture();
 		gTexture.SetImage2D(this.width, this.height, new Color[width * height]);
+		SetFilter(TextureMin.Nearest, TextureMag.Nearest);
+		SetWrap(TextureWrap.ClampToEdge);
 		
 		frameBufferHandle = GL.GenFramebuffer();
 		GL.BindFramebuffer(FramebufferTarget.Framebuffer, frameBufferHandle);
@@ -57,17 +63,22 @@ public class RenderTexture : Texture
 	{
 		GL.BindFramebuffer(FramebufferTarget.Framebuffer, frameBufferHandle);
 		GL.Viewport(0, 0, width, height);
-		GL.ClearColor(Color.transparent);
+		previousClearColor = GL.GetClearColor();
+		GL.ClearColor(clearColor);
 		GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 	}
 	
 	public void Unbind()
 	{
 		GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+		GL.ClearColor(previousClearColor);
 	}
 	
 	public void Dispose()
 	{
+		if (gTexture.isDisposed)
+			return;
+		
 		GL.DeleteFramebuffer(frameBufferHandle);
 		GL.DeleteRenderbuffer(rbHandle);
 		gTexture.Dispose();

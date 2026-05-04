@@ -1,4 +1,7 @@
-﻿namespace Ratelite.GO;
+﻿using Ratelite.Resources;
+using Ratelite.Utils;
+
+namespace Ratelite.GO;
 
 public class Camera
 {
@@ -6,12 +9,19 @@ public class Camera
 			(a, b) => a.drawOrder.CompareTo(b.drawOrder);
 	
 	private readonly CameraUniform uniform = new ();
+	private readonly Mesh mesh;
 	
 	public Vector2 resolution { get; private set; }
 	public Vector2 halfResolution { get; private set; }
+	public RenderTexture renderTexture { get; private set; } = null!;
 	
+	public Material material;
 	public Vector2 position;
-	
+	public Color backgroundColor
+	{
+		get => renderTexture.clearColor;
+		set => renderTexture.clearColor = value;
+	}
 	public float zoom
 	{
 		get;
@@ -26,21 +36,32 @@ public class Camera
 	{
 		var window = R.game.window;
 		window.resized += OnWindowResized;
+		
+		mesh = MeshFactory.CreateQuad(Vector2.one);
+		material = Vault.GetAsset<Material>(GOModule.CAMERA_MATERIAL)!;
 		UpdateZoom();
+		UpdateRenderTexture();
 	}
 	
 	internal void Render(List<RObject> objects)
 	{
 		uniform.projection = Matrix3X3.CreateTranslation(-position) *
-							 Matrix3X3.CreateOrthographic(resolution.x, resolution.y) ;
+							 Matrix3X3.CreateOrthographic(resolution.x, resolution.y);
 		uniform.deltaTime = Time.delta;
 		uniform.time = Time.total;
 		uniform.UpdateBuffer();
 		
 		objects.Sort(drawOrderComparison);
 		
-		foreach (var obj in objects)
-			obj.Render();
+		renderTexture.Bind();
+		{
+			foreach (var obj in objects)
+				obj.Render();
+		}
+		renderTexture.Unbind();
+		
+		material.ApplyProperties();
+		mesh.Draw();
 	}
 	
 	public Vector2 ScreenToWorldPosition(Vector2 screenPosition)
@@ -53,16 +74,40 @@ public class Camera
 	{
 		resolution = R.game.window.size / zoom;
 		halfResolution = resolution * 0.5F;
+		material.SetProperty("u_model", Matrix3X3.CreateScale(resolution));
 	}
 	
 	private void OnWindowResized(Vector2Int size)
 	{
 		if (size != Vector2.zero)
+		{
+			renderTexture.Dispose();
+			UpdateRenderTexture();
 			UpdateZoom();
+		}
+	}
+	
+	private void UpdateRenderTexture()
+	{
+		renderTexture = new RenderTexture(
+			(uint)R.game.window.size.x,
+			(uint)R.game.window.size.y
+		);
+		material.SetProperty("u_texture", renderTexture);
+		material.SetProperty(
+			"u_projection",
+			Matrix3X3.CreateTranslation(new Vector2(0, 0)) *
+			Matrix3X3.CreateOrthographic(resolution.x, resolution.y, false)
+		);
 	}
 	
 	internal void Destroy()
 	{
+		MainThreadQueue.Enqueue(() =>
+		{
+			renderTexture.Dispose();
+			mesh.Dispose();
+		});
 		R.game.window.resized -= OnWindowResized;
 	}
 }

@@ -3,6 +3,7 @@
 public class World : IPlugin
 {
 	private readonly List<RObject> objects = [];
+	// TODO > Ajouter un support de plusieurs cameras o(*≧▽≦)ツ┏━┓
 	public readonly Camera camera = new ();
 	
 	public RObject this[int index] => objects[index];
