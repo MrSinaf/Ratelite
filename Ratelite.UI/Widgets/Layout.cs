@@ -47,6 +47,7 @@ public class Layout : UIElement
 		}
 	}
 	
+	public Layout() => isInteractif = false;
 	
 	public override void AddChild(UIElement element)
 	{
