@@ -19,6 +19,8 @@ internal static unsafe class GLNative
 	internal static delegate*
 			unmanaged[Cdecl]<GetPName, int*, void> glGetIntegerv;
 	internal static delegate*
+			unmanaged[Cdecl]<GetPName, float*, void> glGetFloatv;
+	internal static delegate*
 			unmanaged[Cdecl]<EnableCap, byte> glIsEnabled;
 	internal static delegate*
 			unmanaged[Cdecl]<int, int, int, int, void> glScissor;
@@ -232,6 +234,8 @@ internal static unsafe class GLNative
 				LoadProc("glBlendFunc");
 		glGetIntegerv = (delegate* unmanaged[Cdecl]<GetPName, int*, void>)
 				LoadProc("glGetIntegerv");
+		glGetFloatv = (delegate* unmanaged[Cdecl]<GetPName, float*, void>)
+				LoadProc("glGetFloatv");
 		glIsEnabled = (delegate* unmanaged[Cdecl]<EnableCap, byte>)
 				LoadProc("glIsEnabled");
 		glScissor = (delegate* unmanaged[Cdecl]<int, int, int, int, void>)

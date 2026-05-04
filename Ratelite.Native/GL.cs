@@ -469,6 +469,28 @@ public static unsafe class GL
 		value = data;
 	}
 	
+	public static void GetFloat(GetPName pname, Span<float> values)
+	{
+		fixed (float* data = values)
+		{
+			glGetFloatv(pname, data);
+		}
+	}
+	
+	public static void GetFloat(GetPName pname, out float value)
+	{
+		var data = 0F;
+		glGetFloatv(pname, &data);
+		value = data;
+	}
+	
+	public static Color GetClearColor()
+	{
+		Span<float> oldClearColor = stackalloc float[4];
+		GetFloat(GetPName.ColorClearValue, oldClearColor);
+		return new Color(oldClearColor[0], oldClearColor[1], oldClearColor[2], oldClearColor[3]);
+	}
+	
 	public static void Scissor(int x, int y, uint width, uint height)
 		=> glScissor(x, y, (int)width, (int)height);
 }
