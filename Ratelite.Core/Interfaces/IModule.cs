@@ -23,6 +23,13 @@ public interface ILoadableModule : IModule
 }
 
 [UsedImplicitly]
+public interface IRenderablePhaseModule : IModule
+{
+	public void BeginRender();
+	public void EndRender();
+}
+
+[UsedImplicitly]
 public interface IRenderableModule : IModule
 {
 	public void Render();

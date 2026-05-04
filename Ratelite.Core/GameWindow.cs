@@ -10,6 +10,7 @@ public class GameWindow
 	private readonly IModule[] modules;
 	private readonly List<IUpdatableModule> updatables = [];
 	private readonly List<IRenderableModule> renderables = [];
+	private readonly List<IRenderablePhaseModule> renderablePhases = [];
 	private readonly List<IDisposableModule> disposables = [];
 	
 	public Color windowColor
@@ -70,6 +71,8 @@ public class GameWindow
 					renderables.Add(renderable);
 				if (module is IDisposableModule disposable)
 					disposables.Add(disposable);
+				if (module is IRenderablePhaseModule renderablePhase)
+					renderablePhases.Add(renderablePhase);
 			}
 			catch (Exception e)
 			{
@@ -105,6 +108,19 @@ public class GameWindow
 	
 	private void Render()
 	{
+		foreach (var module in renderablePhases)
+		{
+			try
+			{
+				module.BeginRender();
+			}
+			catch (Exception e)
+			{
+				Log.Write("Begin render error ＼(;⊙x⊙)／", e);
+			}	
+			
+		}
+		
 		try
 		{
 			Stage.current.InternalRender();
@@ -125,6 +141,19 @@ public class GameWindow
 			{
 				Log.Write($"Render error in {module.GetType().Name}", e);
 			}
+		}
+		
+		foreach (var module in renderablePhases)
+		{
+			try
+			{
+				module.EndRender();
+			}
+			catch (Exception e)
+			{
+				Log.Write("End render error ＼(⊙x⊙;)／", e);
+			}
+			
 		}
 	}
 	
