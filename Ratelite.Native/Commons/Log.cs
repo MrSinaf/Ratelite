@@ -35,7 +35,7 @@ public static class Log
 			Console.ForegroundColor = color;
 			Console.Write(type);
 			Console.ResetColor();
-			Console.Write($"] {content}\n");
+			Console.WriteLine($"] {content}");
 		}
 	}
 	
