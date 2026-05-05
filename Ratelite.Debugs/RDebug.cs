@@ -1,8 +1,11 @@
-﻿namespace Ratelite.Debugs;
+﻿using Ratelite.Debugs.Windows;
+
+namespace Ratelite.Debugs;
 
 public static class RDebug
 {
 	public static bool showMenuBar = true;
+	public static VaultDebug vault = new ();
 	
 	internal static void Render()
 	{
@@ -29,6 +32,15 @@ public static class RDebug
 					ImGui.EndMenu();
 				}
 				
+				
+				if (ImGui.BeginMenu("Windows"))
+				{
+					if (ImGui.MenuItem("Vault"))
+						vault.show = !vault.show;
+					
+					ImGui.EndMenu();
+				}
+				
 				if (ImGui.MenuItem("Exit"))
 					R.game.window.Close();
 				
@@ -38,5 +50,7 @@ public static class RDebug
 		ImGui.EndMainMenuBar();
 		ImGui.PopStyleVar();
 		ImGui.PopStyleColor();
+		
+		vault.Render();
 	}
 }

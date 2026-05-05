@@ -220,7 +220,7 @@ public static class Vault
 	}
 }
 
-internal class AssetReference(object asset)
+public class AssetReference(object asset)
 {
 	public readonly object asset = asset;
 }
