@@ -50,11 +50,12 @@ public class Texture2D : Texture, IResourceAsync<Texture2D>, IDisposable
 	
 	public RawImage AsRawImage() => new (size.x, size.y, Color.AsBytes(pixels).ToArray());
 	
-	public void Dispose()
-	{
-		gTexture.Dispose();
-		GC.SuppressFinalize(this);
-	}
+	public void Dispose() => MainThreadQueue.Enqueue(() =>
+		{
+			gTexture.Dispose();
+			GC.SuppressFinalize(this);
+		}
+	);
 	
 	public static Texture2D Load(VaultRessource ress)
 	{
