@@ -31,7 +31,6 @@ public class UIElement
 	public RegionInt clipArea { get; private set; }
 	public bool isCursorOver { get; private set; }
 	
-	public virtual bool active { get; set; } = true;
 	public bool captureCursorEvent { get; set; } = true;
 	public bool isInteractif { get; set; } = true;
 	public bool visible { get; set; } = true;
@@ -45,6 +44,16 @@ public class UIElement
 	
 	public event Action<UIElement> elementChanged = delegate { };
 	
+	public virtual bool active
+	{
+		get;
+		set
+		{
+			field = value;
+			if (field)
+				isDirty = true;
+		}
+	} = true;
 	public virtual Vector2 position
 	{
 		get;
