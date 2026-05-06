@@ -29,10 +29,6 @@ public class AudioClip : IResourceAsync<AudioClip>
 	private AudioClip(byte[] pcmBytes, ALFormat format, int sampleRate)
 			: this(pcmBytes, format, pcmBytes.Length, 0, sampleRate) { }
 	
-	/*
-		TODO > Comme nous ne sommes normalement pas en ASYNC il serait peut-être mieux de gérer le
-		cas où il n'est pas nécessaire de l'écuter dans le MainThreadQueue
-	*/
 	public static AudioClip Load(VaultRessource ress) => ress.extension switch
 	{
 		".wav" => LoadWav(ress),
