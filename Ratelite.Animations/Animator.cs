@@ -1,7 +1,10 @@
 namespace Ratelite.Animations;
 
-public class Animator<T>
+public class Animator<T> : IUpdatableComponent
 {
+	public int priority => 0;
+	public bool enable { get; set; }
+	
 	public AnimationController<T> controller { get; private set; }
 	public AnimationBlock<T>? animationBlock { get; private set; }
 	

@@ -6,7 +6,7 @@ public class ComponentSystem
 	private readonly List<IRenderableComponent> renderableComponents = [];
 	private readonly List<IUpdatableComponent> updatableComponents = [];
 	
-	public void AddComponent<T>() where T : IComponent, new()
+	public T AddComponent<T>() where T : IComponent, new()
 	{
 		var component = new T();
 		components.Add(component);
@@ -21,6 +21,8 @@ public class ComponentSystem
 				updatableComponents.Add(updatable);
 				break;
 		}
+		
+		return component;
 	}
 	
 	public void RemoveComponent<T>(T component) where T : IComponent
@@ -37,6 +39,12 @@ public class ComponentSystem
 				break;
 		}
 	}
+	
+	public IEnumerable<T> GetComponents<T>()
+		=> components.OfType<T>();
+	
+	public T? GetComponent<T>()
+		=> (T?)components.FirstOrDefault(x => x is T);
 	
 	public void Update()
 	{

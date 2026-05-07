@@ -3,6 +3,7 @@
 public class Scene
 {
 	private readonly List<IPlugin> plugins = [];
+	public readonly ComponentSystem componentSystem = new();
 	
 	public bool isRunning { get; private set; }
 	
@@ -40,6 +41,7 @@ public class Scene
 				Log.Write($"Plugin error: ({plugin.GetType()})\n" + e.Message, Log.Level.Error);
 			}
 		}
+		componentSystem.Update();
 		Update();
 	}
 	
@@ -60,6 +62,7 @@ public class Scene
 				);
 			}
 		}
+		componentSystem.Render();
 		Render();
 	}
 	
@@ -95,5 +98,7 @@ public class Scene
 				Log.Write($"Plugin error: ({plugin.GetType()})\n" + e.Message, Log.Level.Error);
 			}
 		}
+		
+		componentSystem.Destroy();
 	}
 }
