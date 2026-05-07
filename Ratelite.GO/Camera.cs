@@ -1,4 +1,5 @@
-﻿using Ratelite.Resources;
+﻿using Ratelite.Bindings;
+using Ratelite.Resources;
 using Ratelite.Utils;
 
 namespace Ratelite.GO;
@@ -11,12 +12,16 @@ public class Camera
 	private readonly CameraUniform uniform = new ();
 	private readonly Mesh mesh;
 	
+	public World? world { get; internal set; }
 	public Vector2 resolution { get; private set; }
 	public Vector2 halfResolution { get; private set; }
 	public RenderTexture renderTexture { get; private set; } = null!;
 	
+	public bool actif = true;
+	public bool visible = true;
 	public Material material;
 	public Vector2 position;
+	
 	public Color backgroundColor
 	{
 		get => renderTexture.clearColor;
@@ -31,6 +36,15 @@ public class Camera
 			UpdateZoom();
 		}
 	} = 1;
+	public int priority
+	{
+		get;
+		set
+		{
+			field = value;
+			world?.UpdateCameraPriorities();
+		}
+	}
 	
 	public Camera()
 	{
@@ -38,7 +52,7 @@ public class Camera
 		window.resized += OnWindowResized;
 		
 		mesh = MeshFactory.CreateQuad(Vector2.one);
-		material = Vault.GetAsset<Material>(GOModule.CAMERA_MATERIAL)!;
+		material = new Material(Vault.GetAsset<Shader>(GOModule.CAMERA_SHADER)!);
 		UpdateZoom();
 		UpdateRenderTexture();
 	}
@@ -60,8 +74,11 @@ public class Camera
 		}
 		renderTexture.Unbind();
 		
-		material.ApplyProperties();
-		mesh.Draw();
+		if (visible)
+		{
+			material.ApplyProperties();
+			mesh.Draw();
+		}
 	}
 	
 	public Vector2 ScreenToWorldPosition(Vector2 screenPosition)
@@ -104,10 +121,11 @@ public class Camera
 	internal void Destroy()
 	{
 		MainThreadQueue.Enqueue(() =>
-		{
-			renderTexture.Dispose();
-			mesh.Dispose();
-		});
+			{
+				renderTexture.Dispose();
+				mesh.Dispose();
+			}
+		);
 		R.game.window.resized -= OnWindowResized;
 	}
 }
