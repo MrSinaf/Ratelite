@@ -3,15 +3,30 @@
 public class World : IPlugin
 {
 	private readonly List<RObject> objects = [];
-	public readonly Camera camera = new ();
+	private readonly List<Camera> cameras = [];
 	
+	public Camera camera => cameras.Last();
 	public RObject this[int index] => objects[index];
-	public RObject? this[string name] => objects.Find(obj => obj.name == name); 
+	public RObject? this[string name] => objects.Find(obj => obj.name == name);
 	
 	public void Init()
+		=> AddCamera(new Camera());
+	
+	public void AddCamera(Camera camera)
 	{
-		
+		camera.world = this;
+		cameras.Add(camera);
+		UpdateCameraPriorities();
 	}
+	
+	public void RemoveCamera(Camera camera)
+	{
+		camera.world = null;
+		cameras.Remove(camera);
+	}
+	
+	public void UpdateCameraPriorities()
+		=> cameras.Sort((a, b) => a.priority.CompareTo(b.priority));
 	
 	public void Update()
 	{
@@ -34,12 +49,17 @@ public class World : IPlugin
 	
 	public void Render()
 	{
-		camera.Render(objects);
+		foreach (var camera in cameras)
+		{
+			if (camera.actif)
+				camera.Render(objects);
+		}
 	}
 	
 	public void Destroy()
 	{
-		camera.Destroy();
+		foreach (var camera in cameras)
+			camera.Destroy();
 		foreach (var obj in objects)
 			obj.Destroy();
 	}
