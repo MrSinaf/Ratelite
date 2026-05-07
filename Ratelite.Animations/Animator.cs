@@ -40,7 +40,7 @@ public class Animator<T> : IUpdatableComponent
 		return this;
 	}
 	
-	public void SetAnimation(string name)
+	public void SetAnimationBlock(string name)
 	{
 		Stop();
 		animationBlock = controller.GetBlock(name);
