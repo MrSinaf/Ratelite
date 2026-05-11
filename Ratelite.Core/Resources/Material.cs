@@ -33,7 +33,7 @@ public class Material : IAsset
 	
 	public void ApplyProperties()
 	{
-		R.MainThreadAssert();
+		MainThread.Assert();
 		foreach (var (name, value) in properties)
 		{
 			switch (value)

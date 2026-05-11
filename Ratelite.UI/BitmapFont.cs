@@ -36,7 +36,7 @@ public class BitmapFont : IResourceAsync<BitmapFont>
 			new Texture2D.Config(TextureMin.Linear, TextureMag.Linear, TextureWrap.ClampToEdge)
 		);
 		material.SetTexture(texture);
-		MainThreadQueue.EnqueueRenderer(() => texture.gTexture.GenerateMipmap());
+		MainThread.Enqueue(() => texture.gTexture.GenerateMipmap());
 		
 		return new BitmapFont
 		{
@@ -70,8 +70,8 @@ public class BitmapFont : IResourceAsync<BitmapFont>
 		);
 		material.SetTexture(texture);
 		
-		MainThreadQueue.EnqueueRenderer(() => texture.gTexture.GenerateMipmap());
-		await MainThreadQueue.Wait();
+		MainThread.Enqueue(() => texture.gTexture.GenerateMipmap());
+		await MainThread.Wait();
 		
 		return new BitmapFont
 		{

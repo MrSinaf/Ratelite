@@ -1,6 +1,5 @@
 ﻿using Ratelite.Bindings;
 using Ratelite.Rendering;
-using Ratelite.Utils;
 
 namespace Ratelite.Resources;
 
@@ -32,7 +31,7 @@ public class Texture2D : Texture, IResourceAsync<Texture2D>, IDisposable
 		
 		this.pixels = pixels;
 		
-		MainThreadQueue.EnqueueRenderer(() =>
+		MainThread.Enqueue(() =>
 			{
 				gTexture = new GTexture();
 				gTexture.SetImage2D((uint)width, (uint)height, pixels);
@@ -50,7 +49,7 @@ public class Texture2D : Texture, IResourceAsync<Texture2D>, IDisposable
 	
 	public RawImage AsRawImage() => new (size.x, size.y, Color.AsBytes(pixels).ToArray());
 	
-	public void Dispose() => MainThreadQueue.Enqueue(() =>
+	public void Dispose() => MainThread.Enqueue(() =>
 		{
 			gTexture.Dispose();
 			GC.SuppressFinalize(this);

@@ -1,6 +1,4 @@
-﻿using Ratelite.Utils;
-
-namespace Ratelite.Sounds;
+﻿namespace Ratelite.Sounds;
 
 public unsafe class SoundModule : ILoadableModule, IDisposableModule
 {
@@ -15,14 +13,14 @@ public unsafe class SoundModule : ILoadableModule, IDisposableModule
 	
 	public Task Load()
 	{
-		MainThreadQueue.Enqueue(() =>
+		MainThread.Enqueue(() =>
 		{
 			device  = AL.OpenDevice();
 			context = AL.CreateContext(device);
 			AL.MakeContextCurrent(context);
 		});
 		
-		MainThreadQueue.Wait().Wait();
+		MainThread.Wait().Wait();
 		return Task.CompletedTask;
 	}
 	

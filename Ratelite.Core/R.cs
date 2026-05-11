@@ -1,8 +1,5 @@
-﻿using System.Diagnostics;
-using System.Reflection;
-using System.Runtime.CompilerServices;
+﻿using System.Reflection;
 using Ratelite.Rendering;
-using Ratelite.Utils;
 
 namespace Ratelite;
 
@@ -12,13 +9,9 @@ public static class R
 	public static bool isRunning { get; private set; }
 	
 	internal static RawImage icon { get; private set; } = null!;
-	private static int mainThreadId;
-	
-	public static bool isMainThread => Environment.CurrentManagedThreadId == mainThreadId;
 	
 	public static RConfig CreateGame(string? gameName = null)
 	{
-		mainThreadId = Environment.CurrentManagedThreadId;
 		AppDomain.CurrentDomain.AssemblyResolve -= ResolveAssembly;
 		AppDomain.CurrentDomain.AssemblyResolve += ResolveAssembly;
 		return new RConfig { windowOptions = new WindowOptions(gameName ?? "RGame", 1280, 720) };
@@ -46,7 +39,7 @@ public static class R
 		{
 			game = new GameWindow(config, splash);
 			splash.Destroy();
-			MainThreadQueue.Enqueue(() =>
+			MainThread.Enqueue(() =>
 					Stage.Load(
 						(Scene)Activator.CreateInstance(config.startingScene ?? typeof(Scene))!
 					)
@@ -67,17 +60,6 @@ public static class R
 			3 => $" - [{versionDetails[1]} {versionDetails[2]}]",
 			_ => string.Empty
 		};
-	}
-	
-	[Conditional("DEBUG")]
-	public static void MainThreadAssert([CallerMemberName] string caller = "")
-	{
-		if (!isMainThread)
-			throw new InvalidOperationException(
-				string.IsNullOrEmpty(caller)
-						? "This method must be called from the MainThread. ( ´･･)ﾉ(._.`)"
-						: $"'{caller}' must be called from the MainThread. ( ´･･)ﾉ(._.`)"
-			);
 	}
 	
 	private static RawImage GetApplicationIcon()

@@ -139,6 +139,7 @@ public sealed unsafe class Window
 	
 	public void Run()
 	{
+		MainThread.Init();
 		var stopwatch = Stopwatch.StartNew();
 		var lastTime = 0.0;
 		

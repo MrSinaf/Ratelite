@@ -71,7 +71,7 @@ public class SplashWindow
 			}
 			"""
 		);
-		MainThreadQueue.EnqueueRenderer(() =>
+		MainThread.Enqueue(() =>
 			{
 				shader.gProgram.SetUniform(
 					"u_projection",
@@ -117,8 +117,7 @@ public class SplashWindow
 	
 	private void Render()
 	{
-		MainThreadQueue.ExecuteAll();
-		MainThreadQueue.ExecuteAllRenderer();
+		MainThread.ExecuteAll();
 		currentProgress = float.Lerp(
 			currentProgress,
 			progress,

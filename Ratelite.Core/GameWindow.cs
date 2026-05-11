@@ -1,5 +1,4 @@
 ﻿using Ratelite.Platforms;
-using Ratelite.Utils;
 
 namespace Ratelite;
 
@@ -97,8 +96,8 @@ public class GameWindow
 		
 		try
 		{
+			MainThread.ExecuteAll();
 			Stage.current.InternalUpdate();
-			MainThreadQueue.ExecuteAll();
 		}
 		catch (Exception e)
 		{
@@ -124,7 +123,6 @@ public class GameWindow
 		try
 		{
 			Stage.current.InternalRender();
-			MainThreadQueue.ExecuteAllRenderer();
 		}
 		catch (Exception e)
 		{
