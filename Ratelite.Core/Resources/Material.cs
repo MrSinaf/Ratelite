@@ -1,5 +1,4 @@
 ﻿using Ratelite.Rendering;
-using Ratelite.Utils;
 
 namespace Ratelite.Resources;
 
@@ -34,6 +33,7 @@ public class Material : IAsset
 	
 	public void ApplyProperties()
 	{
+		R.MainThreadAssert();
 		foreach (var (name, value) in properties)
 		{
 			switch (value)

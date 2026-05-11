@@ -42,6 +42,7 @@ public class Mesh : IAsset, IDisposable
 		if (!isValid)
 			return;
 		
+		R.MainThreadAssert();
 		vao.Dispose();
 		
 		vertexBuffer.Bind();
@@ -51,6 +52,10 @@ public class Mesh : IAsset, IDisposable
 	
 	public void Draw()
 	{
+		R.MainThreadAssert();
+		
+		ObjectDisposedException.ThrowIf(!isValid, nameof(Mesh));
+		
 		vao.Bind();
 		GL.DrawElements(
 			PrimitiveType.Triangles,
@@ -64,6 +69,7 @@ public class Mesh : IAsset, IDisposable
 	
 	public void ApplyVertex(int offset, int length)
 	{
+		R.MainThreadAssert();
 		unsafe
 		{
 			fixed (VertexPositionUV* ptr = vertices.AsSpan(offset, length))
@@ -82,6 +88,7 @@ public class Mesh : IAsset, IDisposable
 	
 	public void ApplyIndices(int offset, int length)
 	{
+		R.MainThreadAssert();
 		unsafe
 		{
 			fixed (uint* ptr = indices.AsSpan(offset, length))
@@ -93,6 +100,7 @@ public class Mesh : IAsset, IDisposable
 	
 	private unsafe void CreateBuffer()
 	{
+		R.MainThreadAssert();
 		fixed (VertexPositionUV* ptr = vertices.AsSpan())
 		{
 			vertexBuffer = new GBuffer<byte>(
@@ -144,6 +152,8 @@ public class Mesh : IAsset, IDisposable
 	{
 		if (isDisposed)
 			return;
+		
+		R.MainThreadAssert();
 		
 		vao.Dispose();
 		vertexBuffer.Dispose();
