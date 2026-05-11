@@ -15,12 +15,12 @@ public class GOModule : ILoadableModule
 	{
 		if (!Vault.ContainsAsset(DEFAULT_SHADER))
 		{
-			await Vault.LoadManifestResource<Shader>(
+			await Vault.LoadManifestResourceAsync<Shader>(
 				GetType().Assembly,
 				"Ratelite.GO.assets.default.rshad",
 				DEFAULT_SHADER
 			);
-			await Vault.LoadManifestResource<Shader>(
+			await Vault.LoadManifestResourceAsync<Shader>(
 				GetType().Assembly,
 				"Ratelite.GO.assets.camera.rshad",
 				CAMERA_SHADER

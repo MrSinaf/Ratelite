@@ -25,7 +25,7 @@ public class UIModule : ILoadableModule
 		if (!Vault.ContainsAsset(DEFAULT_SHADER))
 		{
 			var assembly = GetType().Assembly;
-			var shader = await Vault.LoadManifestResource<Shader>(
+			var shader = await Vault.LoadManifestResourceAsync<Shader>(
 				assembly,
 				"Ratelite.UI.assets.default.rshad",
 				DEFAULT_SHADER
@@ -35,7 +35,7 @@ public class UIModule : ILoadableModule
 				new MaterialUI(shader).SetTexture(Primitif.whitePixel)
 			);
 			
-			await Vault.LoadManifestResource<BitmapFont>(
+			await Vault.LoadManifestResourceAsync<BitmapFont>(
 				assembly,
 				"Ratelite.UI.assets.compliance-sans.ttf",
 				DEFAULT_FONT
