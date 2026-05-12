@@ -3,7 +3,7 @@
 
 public abstract class Texture
 {
-	public GTexture gTexture = null!;
+	public readonly GTexture gTexture = new ();
 	
 	public void SetWrap(TextureWrap wrap)
 	{

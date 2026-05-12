@@ -11,6 +11,7 @@ public class GVertexArrayObject : IDisposable
 	
 	public GVertexArrayObject(uint strideInBytes)
 	{
+		MainThread.Assert();
 		this.strideInBytes = strideInBytes;
 		handle = GL.GenVertexArray();
 		if (handle == 0)
@@ -37,11 +38,13 @@ public class GVertexArrayObject : IDisposable
 	
 	public void Bind()
 	{
+		MainThread.Assert();
 		GL.BindVertexArray(handle);
 	}
 	
 	public void Dispose()
 	{
+		MainThread.Assert();
 		if (isDisposed)
 			return;
 		

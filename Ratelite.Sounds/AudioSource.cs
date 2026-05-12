@@ -39,9 +39,23 @@ public class AudioSource : IDisposable
 		set => AL.SetSource(handle, ALSourceParam.Looping, value ? 1 : 0);
 	}
 	
-	public void Play() => AL.PlaySource(handle);
-	public void Pause() => AL.PauseSource(handle);
-	public void Stop() => AL.StopSource(handle);
+	public void Play()
+	{
+		MainThread.Assert();
+		AL.PlaySource(handle);
+	}
+	
+	public void Pause()
+	{
+		MainThread.Assert();
+		AL.PauseSource(handle);
+	}
+	
+	public void Stop()
+	{
+		MainThread.Assert();
+		AL.StopSource(handle);
+	}
 	
 	public void Dispose()
 	{

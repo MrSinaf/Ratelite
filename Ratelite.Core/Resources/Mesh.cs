@@ -52,8 +52,6 @@ public class Mesh : IAsset, IDisposable
 	
 	public void Draw()
 	{
-		MainThread.Assert();
-		
 		ObjectDisposedException.ThrowIf(!isValid, nameof(Mesh));
 		
 		vao.Bind();
@@ -69,7 +67,6 @@ public class Mesh : IAsset, IDisposable
 	
 	public void ApplyVertex(int offset, int length)
 	{
-		MainThread.Assert();
 		unsafe
 		{
 			fixed (VertexPositionUV* ptr = vertices.AsSpan(offset, length))
@@ -88,7 +85,6 @@ public class Mesh : IAsset, IDisposable
 	
 	public void ApplyIndices(int offset, int length)
 	{
-		MainThread.Assert();
 		unsafe
 		{
 			fixed (uint* ptr = indices.AsSpan(offset, length))
@@ -100,7 +96,6 @@ public class Mesh : IAsset, IDisposable
 	
 	private unsafe void CreateBuffer()
 	{
-		MainThread.Assert();
 		fixed (VertexPositionUV* ptr = vertices.AsSpan())
 		{
 			vertexBuffer = new GBuffer<byte>(
@@ -152,8 +147,6 @@ public class Mesh : IAsset, IDisposable
 	{
 		if (isDisposed)
 			return;
-		
-		MainThread.Assert();
 		
 		vao.Dispose();
 		vertexBuffer.Dispose();

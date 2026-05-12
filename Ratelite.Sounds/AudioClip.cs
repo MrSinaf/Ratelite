@@ -19,6 +19,7 @@ public class AudioClip : IResourceAsync<AudioClip>
 	{
 		unsafe
 		{
+			MainThread.Assert();
 			this.duration = duration;
 			var buffer = AL.GenBuffer();
 			fixed (byte* ptr = &bytes[dataOffset])

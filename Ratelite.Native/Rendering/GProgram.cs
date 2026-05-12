@@ -5,8 +5,6 @@ namespace Ratelite.Rendering;
 
 public class GProgram : IDisposable
 {
-	private static uint? currentHandle;
-	
 	private readonly Dictionary<string, int> uniformLocations = [];
 	private readonly Dictionary<string, int> attribLocations = [];
 	public readonly uint handle = GL.CreateProgram();
@@ -17,15 +15,13 @@ public class GProgram : IDisposable
 	
 	public void Bind()
 	{
-		if (currentHandle == handle)
-			return;
-		
+		MainThread.Assert();
 		GL.UseProgram(handle);
-		currentHandle = handle;
 	}
 	
 	public void Compile(string vertexSource, string fragmentSource)
 	{
+		MainThread.Assert();
 		if (!string.IsNullOrEmpty(vertexSource))
 			CompileShader(ShaderType.VertexShader, vertexSource);
 		
@@ -84,7 +80,7 @@ public class GProgram : IDisposable
 		}
 	}
 	
-	public void Decompile()
+	private void Decompile()
 	{
 		GL.DetachShader(handle, vertexHandle);
 		GL.DeleteShader(vertexHandle);
@@ -433,6 +429,7 @@ public class GProgram : IDisposable
 		if (uniformLocations.TryGetValue(name, out location))
 			return location != -1;
 		
+		MainThread.Assert();
 		location = GL.GetUniformLocation(handle, name);
 		uniformLocations[name] = location;
 		return location != -1;
@@ -443,6 +440,7 @@ public class GProgram : IDisposable
 		if (attribLocations.TryGetValue(name, out location))
 			return location != -1;
 		
+		MainThread.Assert();
 		location = GL.GetAttribLocation(handle, name);
 		attribLocations[name] = location;
 		return location != -1;
@@ -450,11 +448,9 @@ public class GProgram : IDisposable
 	
 	public void Dispose()
 	{
+		MainThread.Assert();
 		if (isDisposed)
 			return;
-		
-		// if (currentHandle == handle)
-		// 	currentHandle = null;
 		
 		GL.DeleteProgram(handle);
 		isDisposed = true;

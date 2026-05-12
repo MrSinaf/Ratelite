@@ -23,7 +23,6 @@ public class RenderTexture : Texture
 		size = new Vector2Int((int)width, (int)height);
 		texel = Vector2.one / size;
 		
-		gTexture = new GTexture();
 		gTexture.SetImage2D(this.width, this.height, new Color[width * height]);
 		SetFilter(TextureMin.Nearest, TextureMag.Nearest);
 		SetWrap(TextureWrap.ClampToEdge);
@@ -61,6 +60,7 @@ public class RenderTexture : Texture
 	
 	public void Bind()
 	{
+		MainThread.Assert();
 		GL.BindFramebuffer(FramebufferTarget.Framebuffer, frameBufferHandle);
 		GL.Viewport(0, 0, width, height);
 		previousClearColor = GL.GetClearColor();
@@ -70,12 +70,14 @@ public class RenderTexture : Texture
 	
 	public void Unbind()
 	{
+		MainThread.Assert();
 		GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 		GL.ClearColor(previousClearColor);
 	}
 	
 	public void Dispose()
 	{
+		MainThread.Assert();
 		if (gTexture.isDisposed)
 			return;
 		
