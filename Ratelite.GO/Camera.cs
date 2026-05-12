@@ -91,6 +91,11 @@ public class Camera
 		resolution = R.game.window.size / zoom;
 		halfResolution = resolution * 0.5F;
 		material.SetProperty("u_model", Matrix3X3.CreateScale(resolution));
+		material.SetProperty(
+			"u_projection",
+			Matrix3X3.CreateTranslation(new Vector2(0, 0)) *
+			Matrix3X3.CreateOrthographic(resolution.x, resolution.y, false)
+		);
 	}
 	
 	private void OnWindowResized(Vector2Int size)
