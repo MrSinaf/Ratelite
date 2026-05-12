@@ -42,6 +42,7 @@ public class Mesh : IAsset, IDisposable
 		if (!isValid)
 			return;
 		
+		MainThread.Assert();
 		vao.Dispose();
 		
 		vertexBuffer.Bind();
@@ -51,6 +52,8 @@ public class Mesh : IAsset, IDisposable
 	
 	public void Draw()
 	{
+		ObjectDisposedException.ThrowIf(!isValid, nameof(Mesh));
+		
 		vao.Bind();
 		GL.DrawElements(
 			PrimitiveType.Triangles,

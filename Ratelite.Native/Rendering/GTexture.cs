@@ -11,10 +11,15 @@ public class GTexture : IDisposable
 	 */
 	private const TextureTarget TARGET = TextureTarget.Texture2D;
 	
-	private static uint? currentBound;
-	public readonly uint handle = GL.GenTexture();
+	public readonly uint handle;
 	
 	public bool isDisposed { get; protected set; }
+	
+	public GTexture()
+	{
+		MainThread.Assert();
+		handle = GL.GenTexture();
+	}
 	
 	public void SetWrapS(TextureWrap wrap)
 	{
@@ -141,20 +146,16 @@ public class GTexture : IDisposable
 	
 	public void Bind()
 	{
-		// if (currentBound == handle)
-		// 	return;
-		
+		MainThread.Assert();
 		GL.BindTexture(TextureTarget.Texture2D, handle);
-		currentBound = handle;
 	}
 	
 	public void Dispose()
 	{
+		MainThread.Assert();
+		
 		if (isDisposed)
 			return;
-		
-		// if (currentBound == handle)
-		// 	currentBound = null;
 		
 		GL.DeleteTexture(handle);
 		isDisposed = true;

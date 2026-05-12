@@ -14,6 +14,12 @@ public static class Stage
 				oldScene.InternalUnload();
 				await scene.Load();
 			}
-		).ContinueWith(_ => current = scene);
+		).ContinueWith(t =>
+		{
+			if (t.Exception != null)
+				MainThread.Enqueue(() => throw t.Exception);
+			
+			return current = scene;
+		});
 	}
 }

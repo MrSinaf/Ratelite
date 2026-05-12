@@ -22,6 +22,8 @@ public class GBuffer<T> : IDisposable where T : unmanaged
 	
 	public unsafe GBuffer(BufferType type, uint sizeInBytes, void* data, bool dynamic)
 	{
+		MainThread.Assert();
+		
 		this.sizeInBytes = sizeInBytes;
 		target = (BufferTargetARB)type;
 		handle = GL.GenBuffer();
@@ -59,11 +61,13 @@ public class GBuffer<T> : IDisposable where T : unmanaged
 	
 	public void Bind()
 	{
+		MainThread.Assert();
 		GL.BindBuffer(target, handle);
 	}
 	
 	public void Dispose()
 	{
+		MainThread.Assert();
 		if (isDisposed)
 			return;
 		

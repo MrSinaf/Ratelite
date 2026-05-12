@@ -1,6 +1,5 @@
 ﻿using Ratelite.Bindings;
 using Ratelite.Rendering;
-using Ratelite.Utils;
 
 namespace Ratelite.Resources;
 
@@ -31,15 +30,9 @@ public class Texture2D : Texture, IResourceAsync<Texture2D>, IDisposable
 		texel = Vector2.one / size;
 		
 		this.pixels = pixels;
-		
-		MainThreadQueue.EnqueueRenderer(() =>
-			{
-				gTexture = new GTexture();
-				gTexture.SetImage2D((uint)width, (uint)height, pixels);
-				SetFilter(config.minFilter, config.magFilter);
-				SetWrap(config.wrap);
-			}
-		);
+		gTexture.SetImage2D((uint)width, (uint)height, pixels);
+		SetFilter(config.minFilter, config.magFilter);
+		SetWrap(config.wrap);
 	}
 	
 	public Region GetUVRegion(RectInt target)
@@ -50,7 +43,7 @@ public class Texture2D : Texture, IResourceAsync<Texture2D>, IDisposable
 	
 	public RawImage AsRawImage() => new (size.x, size.y, Color.AsBytes(pixels).ToArray());
 	
-	public void Dispose() => MainThreadQueue.Enqueue(() =>
+	public void Dispose() => MainThread.Enqueue(() =>
 		{
 			gTexture.Dispose();
 			GC.SuppressFinalize(this);
@@ -72,8 +65,17 @@ public class Texture2D : Texture, IResourceAsync<Texture2D>, IDisposable
 		);
 	}
 	
-	public static Task<Texture2D> LoadAsync(VaultRessource ress)
-		=> Task.FromResult(Load(ress));
+	public static async Task<Texture2D> LoadAsync(VaultRessource ress)
+	{
+		var config = defaultConfig;
+		if (ress.config is Config c)
+			config = c;
+		
+		var image = ImageResult.FromStream(ress.stream, ColorComponents.RedGreenBlueAlpha);
+		return (await MainThread.EnqueueAndWaitAsync(() => new Texture2D(
+			image.width, image.height, Color.AsColors(image.data).ToArray(), config
+		)))!;
+	}
 	
 	public static bool ValidateExtension(string extension)
 		=> extension is ".png" or ".jpg" or ".jpeg";

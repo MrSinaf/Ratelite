@@ -1,14 +1,14 @@
 ﻿using System.Reflection;
 using Ratelite.Rendering;
-using Ratelite.Utils;
 
 namespace Ratelite;
 
 public static class R
 {
 	public static GameWindow game { get; private set; } = null!;
-	internal static RawImage icon { get; private set; } = null!;
 	public static bool isRunning { get; private set; }
+	
+	internal static RawImage icon { get; private set; } = null!;
 	
 	public static RConfig CreateGame(string? gameName = null)
 	{
@@ -39,21 +39,13 @@ public static class R
 		{
 			game = new GameWindow(config, splash);
 			splash.Destroy();
-			MainThreadQueue.Enqueue(() =>
+			MainThread.Enqueue(() =>
 					Stage.Load(
 						(Scene)Activator.CreateInstance(config.startingScene ?? typeof(Scene))!
 					)
 			);
 			game.window.Run();
 		}
-	}
-	
-	private static RawImage GetApplicationIcon()
-	{
-		using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(
-			"Ratelite.assets.textures.icon-r.png"
-		)!;
-		return RawImage.Load(stream);
 	}
 	
 	public static string GetEngineVersion()
@@ -68,6 +60,14 @@ public static class R
 			3 => $" - [{versionDetails[1]} {versionDetails[2]}]",
 			_ => string.Empty
 		};
+	}
+	
+	private static RawImage GetApplicationIcon()
+	{
+		using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(
+			"Ratelite.assets.textures.icon-r.png"
+		)!;
+		return RawImage.Load(stream);
 	}
 	
 	private static Assembly? ResolveAssembly(object? sender, ResolveEventArgs args)

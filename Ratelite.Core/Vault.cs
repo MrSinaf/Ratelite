@@ -6,6 +6,16 @@ public static class Vault
 {
 	private static readonly Dictionary<string, AssetReference> assets = [];
 	
+	public static bool ContainsAsset(string name) => assets.ContainsKey(name);
+	
+	public static T? GetAsset<T>(string name) where T : class, IAsset
+		=> TryGetAsset<T>(name, out var asset)
+				? asset
+				: throw new NullReferenceException(
+					$"The asset '{name}' with type '{typeof(T)}' is not present in the cache. " +
+					$"(>ლ) Use '{nameof(TryGetAsset)}' to check if it exists!"
+				);
+	
 	public static bool AddAsset<T>(string name, T asset) where T : class, IAsset
 	{
 		if (!assets.TryAdd(name, new AssetReference(asset)))
@@ -21,15 +31,6 @@ public static class Vault
 		return true;
 	}
 	
-	public static bool ReplaceAsset<T>(string name, T asset) where T : class, IAsset
-	{
-		var contains = assets.ContainsKey(name);
-		if (contains)
-			assets[name] = new AssetReference(asset);
-		
-		return contains;
-	}
-	
 	public static void RemoveAsset(string name)
 	{
 		if (name[0] == '@')
@@ -41,16 +42,14 @@ public static class Vault
 		}
 	}
 	
-	public static T? GetAsset<T>(string name) where T : class, IAsset
-		=> TryGetAsset<T>(name, out var asset)
-				? asset
-				: throw new NullReferenceException(
-					$"The asset '{name}' with type '{typeof(T)}' is not present in the cache. " +
-					$"(>ლ) Use '{nameof(TryGetAsset)}' to check if it exists!"
-				);
-	
-	public static bool ContainsAsset(string name)
-		=> assets.ContainsKey(name);
+	public static bool ReplaceAsset<T>(string name, T asset) where T : class, IAsset
+	{
+		var contains = assets.ContainsKey(name);
+		if (contains)
+			assets[name] = new AssetReference(asset);
+		
+		return contains;
+	}
 	
 	public static bool TryGetAsset<T>(string name, out T? asset) where T : class, IAsset
 	{
@@ -64,26 +63,8 @@ public static class Vault
 		return false;
 	}
 	
-	public static async Task<T?> LoadAsyncResource<T>(string path, IResourceConfig? config = null)
-			where T : class, IResourceAsync<T>
-	{
-		var fullPath = Path.Combine("assets", path);
-		if (!File.Exists(fullPath))
-			throw new FileNotFoundException($"The resource '{path}' does not exist! (￣_￣|||)");
-		
-		var extension = Path.GetExtension(fullPath);
-		if (!T.ValidateExtension(extension))
-			throw new ArgumentException(
-				"Unsupported format ⊙﹏⊙∥:" + extension
-			);
-		
-		await using var stream = File.OpenRead(fullPath);
-		var asset = await T.LoadAsync(new VaultRessource(stream, extension, config));
-		return asset;
-	}
-	
 	public static T LoadResource<T>(string path, IResourceConfig? config = null)
-			where T : class, IResourceAsync<T>
+			where T : class, IResource<T>
 	{
 		var fullPath = Path.Combine("assets", path);
 		if (!File.Exists(fullPath))
@@ -100,26 +81,9 @@ public static class Vault
 		return asset;
 	}
 	
-	public static async Task<T?> LoadAsyncResource<T>(
-		string path,
-		string name,
-		IResourceConfig? config = null
-	)
+	public static async Task<T> LoadResourceAsync<T>(string path, IResourceConfig? config = null)
 			where T : class, IResourceAsync<T>
 	{
-		if (assets.TryGetValue(name, out var reference))
-		{
-			Log.Write(
-				$"You are trying to add asset `{name}`, but it's already present in the cache " +
-				$"(*/ω＼*)!",
-				Log.Level.Warning
-			);
-			if (reference.asset is T refAsset)
-				return refAsset;
-			
-			return null;
-		}
-		
 		var fullPath = Path.Combine("assets", path);
 		if (!File.Exists(fullPath))
 			throw new FileNotFoundException($"The resource '{path}' does not exist! (￣_￣|||)");
@@ -132,8 +96,6 @@ public static class Vault
 		
 		await using var stream = File.OpenRead(fullPath);
 		var asset = await T.LoadAsync(new VaultRessource(stream, extension, config));
-		AddAsset(name, asset);
-		
 		return asset;
 	}
 	
@@ -141,8 +103,7 @@ public static class Vault
 		string path,
 		string name,
 		IResourceConfig? config = null
-	)
-			where T : class, IResource<T>
+	) where T : class, IResource<T>
 	{
 		if (assets.TryGetValue(name, out var reference))
 		{
@@ -174,18 +135,140 @@ public static class Vault
 		return asset;
 	}
 	
-	public static async Task<T?> LoadManifestResource<T>(
+	public static async Task<T?> LoadResourceAsync<T>(
+		string path,
+		string name,
+		IResourceConfig? config = null
+	) where T : class, IResourceAsync<T>
+	{
+		if (assets.TryGetValue(name, out var reference))
+		{
+			Log.Write(
+				$"You are trying to add asset `{name}`, but it's already present in the cache " +
+				$"(*/ω＼*)!",
+				Log.Level.Warning
+			);
+			if (reference.asset is T refAsset)
+				return refAsset;
+			
+			return null;
+		}
+		
+		var fullPath = Path.Combine("assets", path);
+		if (!File.Exists(fullPath))
+			throw new FileNotFoundException($"The resource '{path}' does not exist! (￣_￣|||)");
+		
+		var extension = Path.GetExtension(fullPath);
+		if (!T.ValidateExtension(extension))
+			throw new ArgumentException(
+				"Unsupported format ⊙﹏⊙∥:" + extension
+			);
+		
+		await using var stream = File.OpenRead(fullPath);
+		var asset = await T.LoadAsync(new VaultRessource(stream, extension, config));
+		AddAsset(name, asset);
+		
+		return asset;
+	}
+	
+	public static T LoadManifestResource<T>(
+		Assembly assembly,
+		string path,
+		IResourceConfig? config = null
+	) where T : class, IResource<T>
+	{
+		using var stream = assembly.GetManifestResourceStream(path);
+		if (stream == null)
+			throw new FileNotFoundException(
+				$"The resource '{path}' was not found in assembly '{assembly.GetName().Name}'" +
+				"! (￣_￣|||)"
+			);
+		
+		var extension = Path.GetExtension(path);
+		if (!T.ValidateExtension(extension))
+			throw new ArgumentException(
+				"Unsupported format format ⊙﹏⊙∥:" + extension
+			);
+		
+		var asset = T.Load(new VaultRessource(stream, extension, config));
+		return asset;
+	}
+	
+	public static async Task<T> LoadManifestResourceAsync<T>(
+		Assembly assembly,
+		string path,
+		IResourceConfig? config = null
+	) where T : class, IResourceAsync<T>
+	{
+		await using var stream = assembly.GetManifestResourceStream(path);
+		if (stream == null)
+			throw new FileNotFoundException(
+				$"The resource '{path}' was not found in assembly '{assembly.GetName().Name}'" +
+				"! (￣_￣|||)"
+			);
+		
+		var extension = Path.GetExtension(path);
+		if (!T.ValidateExtension(extension))
+			throw new ArgumentException(
+				"Unsupported format format ⊙﹏⊙∥:" + extension
+			);
+		
+		var asset = await T.LoadAsync(new VaultRessource(stream, extension, config));
+		return asset;
+	}
+	
+	public static T? LoadManifestResource<T>(
 		Assembly assembly,
 		string path,
 		string name,
-		IResourceConfig? config = null,
-		bool addInCache = true
+		IResourceConfig? config = null
 	) where T : class, IResource<T>
 	{
 		if (name[0] != '@')
 			name = "@" + name;
 		
-		if (addInCache && assets.TryGetValue(name, out var reference))
+		if (assets.TryGetValue(name, out var reference))
+		{
+			Log.Write(
+				$"You are trying to add asset `{name}`, but it's already present in the cache " +
+				$"(*/ω＼*)!",
+				Log.Level.Warning
+			);
+			if (reference.asset is T refAsset)
+				return refAsset;
+			
+			return null;
+		}
+		
+		using var stream = assembly.GetManifestResourceStream(path);
+		if (stream == null)
+			throw new FileNotFoundException(
+				$"The resource '{path}' was not found in assembly '{assembly.GetName().Name}'" +
+				"! (￣_￣|||)"
+			);
+		
+		var extension = Path.GetExtension(path);
+		if (!T.ValidateExtension(extension))
+			throw new ArgumentException(
+				"Unsupported format format ⊙﹏⊙∥:" + extension
+			);
+		
+		var asset = T.Load(new VaultRessource(stream, extension, config));
+		AddAsset(name, asset);
+		return asset;
+	}
+	
+	public static async Task<T?> LoadManifestResourceAsync<T>(
+		Assembly assembly,
+		string path,
+		string name,
+		IResourceConfig? config = null
+	) where T : class, IResourceAsync<T>
+	{
+		if (name[0] != '@')
+			name = "@" + name;
+		
+		if (assets.TryGetValue(name, out var reference))
 		{
 			Log.Write(
 				$"You are trying to add asset `{name}`, but it's already present in the cache " +
@@ -211,11 +294,8 @@ public static class Vault
 				"Unsupported format format ⊙﹏⊙∥:" + extension
 			);
 		
-		var asset = T.Load(new VaultRessource(stream, extension, config));
-		
-		if (addInCache)
-			AddAsset(name, asset);
-		
+		var asset = await T.LoadAsync(new VaultRessource(stream, extension, config));
+		AddAsset(name, asset);
 		return asset;
 	}
 }

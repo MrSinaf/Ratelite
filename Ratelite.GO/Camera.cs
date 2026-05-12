@@ -119,7 +119,7 @@ public class Camera
 	
 	internal void Destroy()
 	{
-		MainThreadQueue.Enqueue(() =>
+		MainThread.Enqueue(() =>
 			{
 				renderTexture.Dispose();
 				mesh.Dispose();

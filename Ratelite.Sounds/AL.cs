@@ -66,9 +66,22 @@ internal static unsafe class AL
     public static void Volume(float value)
         => alListenerf(0x100A, value);
 
-    public static void PlaySource(uint source)  => alSourcePlay(source);
-    public static void StopSource(uint source)  => alSourceStop(source);
-    public static void PauseSource(uint source) => alSourcePause(source);
+    public static void PlaySource(uint source)
+    {
+        MainThread.Assert();
+        alSourcePlay(source);
+    }
+    
+    public static void StopSource(uint source)
+    {
+        MainThread.Assert();
+        alSourceStop(source);
+    }
+    public static void PauseSource(uint source)
+    {
+        MainThread.Assert();
+        alSourcePause(source);
+    }
 
     public static ALSourceState GetSourceState(uint source)
     {
