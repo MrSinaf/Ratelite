@@ -52,28 +52,20 @@ public class Texture2D : Texture, IResourceAsync<Texture2D>, IDisposable
 	
 	public static Texture2D Load(VaultRessource ress)
 	{
-		var config = defaultConfig;
-		if (ress.config is Config c)
-			config = c;
-		
 		var image = ImageResult.FromStream(ress.stream, ColorComponents.RedGreenBlueAlpha);
 		return new Texture2D(
 			image.width,
 			image.height,
 			Color.AsColors(image.data).ToArray(),
-			config
+			ress.config as Config
 		);
 	}
 	
 	public static async Task<Texture2D> LoadAsync(VaultRessource ress)
 	{
-		var config = defaultConfig;
-		if (ress.config is Config c)
-			config = c;
-		
 		var image = ImageResult.FromStream(ress.stream, ColorComponents.RedGreenBlueAlpha);
 		return (await MainThread.EnqueueAndWaitAsync(() => new Texture2D(
-			image.width, image.height, Color.AsColors(image.data).ToArray(), config
+			image.width, image.height, Color.AsColors(image.data).ToArray(), ress.config as Config
 		)))!;
 	}
 	

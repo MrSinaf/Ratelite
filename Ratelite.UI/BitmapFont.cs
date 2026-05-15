@@ -1,6 +1,5 @@
 ﻿using Ratelite.Rendering;
 using Ratelite.Resources;
-using Ratelite.Utils;
 
 namespace Ratelite.UI;
 
@@ -14,13 +13,10 @@ public class BitmapFont : IResourceAsync<BitmapFont>
 	
 	public static BitmapFont Load(VaultRessource ress)
 	{
-		var config = defaultConfig;
-		if (ress.config is Config c)
-			config = c;
-		
 		using var memoryStream = new MemoryStream();
 		ress.stream.CopyTo(memoryStream);
 		
+		var config = ress.config as Config ?? defaultConfig;
 		var font = new Font(
 			memoryStream.ToArray(),
 			config.textureSize,
@@ -47,13 +43,10 @@ public class BitmapFont : IResourceAsync<BitmapFont>
 	
 	public static async Task<BitmapFont> LoadAsync(VaultRessource ress)
 	{
-		var config = defaultConfig;
-		if (ress.config is Config c)
-			config = c;
-		
 		using var memoryStream = new MemoryStream();
 		await ress.stream.CopyToAsync(memoryStream);
 		
+		var config = ress.config as Config ?? defaultConfig;
 		var font = new Font(
 			memoryStream.ToArray(),
 			config.textureSize,
