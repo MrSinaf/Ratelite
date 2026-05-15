@@ -34,9 +34,23 @@ public class ScrollView : UIElement
 			}
 		);
 		mask.AddChild(content);
+		R.game.window.scrolled += OnScroll;
 		content.elementChanged += ContentChanged;
 		elementChanged += OnChanged;
 		UIPrefab.Apply(prefab, this);
+	}
+	
+	private void OnScroll(Vector2Int delta)
+	{
+		if (isCursorOver)
+		{
+			verticalScroll.cursorPosition += delta.y;
+			horizontalScroll.cursorPosition += delta.x;
+		}
+		else if (horizontalScroll.isCursorOver)
+			horizontalScroll.cursorPosition += delta.x;
+		else if (verticalScroll.isCursorOver)
+			verticalScroll.cursorPosition += delta.y;
 	}
 	
 	private void OnChanged(UIElement _)
@@ -63,6 +77,11 @@ public class ScrollView : UIElement
 	private void OnVerticalScroll(float delta)
 	{
 		content.position = new Vector2(content.position.x, -delta);
+	}
+	
+	public override void OnDestroy()
+	{
+		R.game.window.scrolled -= OnScroll;
 	}
 	
 	[IsDefaultPrefab]

@@ -14,9 +14,9 @@ public class MaterialUI(Shader? shader = null, params (string, object)[] propert
 		get => GetProperty<Texture2D>(TEXTURE);
 		set => SetProperty(TEXTURE, value);
 	}
-	public Rect ninepatch
+	public Region ninepatch
 	{
-		get => GetProperty<Rect>(NINEPATCH);
+		get => GetProperty<Region>(NINEPATCH);
 		set => SetProperty(NINEPATCH, value);
 	}
 	public float ninepatchScale
