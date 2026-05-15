@@ -10,6 +10,18 @@ public static class R
 	
 	internal static RawImage icon { get; private set; } = null!;
 	
+	/// <summary>
+	///	Crée une configuration de jeu qui initialise les options de la fenêtre du jeu.<br/>
+	///	(๑˃ᴗ˂)ﻭ
+	/// </summary>
+	/// <param name="gameName">
+	///	Le nom du jeu à afficher dans la fenêtre (^・ω・^ ). Si null, un nom	par défaut "RGame"
+	/// est utilisé.
+	/// </param>
+	/// <return>
+	///	Retourne une instance de <see cref="RConfig"/> contenant les options de	configuration du
+	/// jeu.
+	/// </return>
 	public static RConfig CreateGame(string? gameName = null)
 	{
 		AppDomain.CurrentDomain.AssemblyResolve -= ResolveAssembly;
@@ -17,6 +29,13 @@ public static class R
 		return new RConfig { windowOptions = new WindowOptions(gameName ?? "RGame", 1280, 720) };
 	}
 	
+	/// <summary>
+	/// Lance le jeu (≧▽≦)ﾉ en utilisant la configuration fournie.
+	/// </summary>
+	/// <param name="config">
+	/// La configuration de jeu <see cref="RConfig"/> contenant les paramètres nécessaires, comme
+	/// les options de la fenêtre, l'icône et la scène de départ et surtout les modules.
+	/// </param>
 	public static void RunGame(RConfig config)
 	{
 		if (isRunning)

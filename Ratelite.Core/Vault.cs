@@ -63,6 +63,31 @@ public static class Vault
 		return false;
 	}
 	
+	/// <summary>
+	/// Charge une ressource de type spécifié à partir d'un chemin relative à 'assets' donné.
+	/// </summary>
+	/// <typeparam name="T">
+	/// Le type de la ressource à charger.
+	/// </typeparam>
+	/// <param name="path">
+	/// Le chemin de la ressource à charger.
+	/// </param>
+	/// <param name="config">
+	/// Une configuration optionnelle (≧ω≦) pour le chargement de la ressource.
+	/// </param>
+	/// <returns>
+	/// La ressource chargée si elle a été validée avec succès. ヾ(＾∇＾)
+	/// </returns>
+	/// <exception cref="FileNotFoundException">
+	/// Levée si le fichier spécifié n'existe pas.
+	/// </exception>
+	/// <exception cref="ArgumentException">
+	/// Levée si l'extension de fichier n'est pas prise en charge.
+	/// </exception>
+	/// <remarks>
+	/// Cette méthode doit être êxécuté exclusivement dans le Thread principal, sinon utiliser sa
+	/// version async!
+	/// </remarks>
 	public static T LoadResource<T>(string path, IResourceConfig? config = null)
 			where T : class, IResource<T>
 	{
@@ -81,6 +106,28 @@ public static class Vault
 		return asset;
 	}
 	
+	/// <summary>
+	/// Charge de manière asynchrone une ressource de type spécifié à partir d'un chemin relatif à
+	/// 'assets' donné. (✿^‿^)
+	/// </summary>
+	/// <typeparam name="T">
+	/// Le type de la ressource à charger. ( ^_^)/
+	/// </typeparam>
+	/// <param name="path">
+	/// Le chemin relatif de la ressource à charger. (/^▽^)/
+	/// </param>
+	/// <param name="config">
+	/// Une configuration optionnelle pour personnaliser le chargement de la ressource.
+	/// </param>
+	/// <returns>
+	/// Une tâche représentant la ressource chargée si l'opération est réussie. ✧٩(ˊωˋ*)و✧
+	/// </returns>
+	/// <exception cref="FileNotFoundException">
+	/// Levée si le fichier spécifié n'existe pas.
+	/// </exception>
+	/// <exception cref="ArgumentException">
+	/// Levée si l'extension de fichier n'est pas prise en charge.
+	/// </exception>
 	public static async Task<T> LoadResourceAsync<T>(string path, IResourceConfig? config = null)
 			where T : class, IResourceAsync<T>
 	{
@@ -99,6 +146,39 @@ public static class Vault
 		return asset;
 	}
 	
+	/// <summary>
+	/// Charge une ressource à partir d'un chemin donné et l'ajoute au cache sous un nom spécifique.
+	/// </summary>
+	/// <typeparam name="T">
+	/// Le type de la ressource à charger.
+	/// </typeparam>
+	/// <param name="path">
+	/// Le chemin relatif à 'assets' de la ressource à charger.
+	/// </param>
+	/// <param name="name">
+	/// Le nom unique sous lequel la ressource sera ajoutée au cache (★^O^★).
+	/// </param>
+	/// <param name="config">
+	/// Une configuration optionnelle pour le chargement de la ressource.
+	/// </param>
+	/// <returns>
+	/// Retourne la ressource chargée si elle est validée avec succès et ajoutée au cache
+	/// ─=≡Σ((((((つ•̀ω•́)つ.<br/> Si la ressource existe déjà dans le cache avec le même nom et le
+	/// même type, cette ressource est retournée. Retourne <c>null</c> si le type de la ressource ne
+	/// correspond pas à celui dans le cache (。´・ω・)ん?.
+	/// </returns>
+	/// <exception cref="FileNotFoundException">
+	/// Levée si le fichier spécifié dans le chemin n'existe pas.
+	/// </exception>
+	/// <exception cref="ArgumentException">
+	/// Levée si l'extension du fichier n'est pas prise en charge.
+	/// </exception>
+	/// <remarks>
+	/// Si une ressource avec le même nom existe déjà mais avec un type différent, elle ne sera pas
+	/// remplacée (￣^￣)ゞ.<br/>
+	/// Cette méthode doit être êxécuté exclusivement dans le Thread principal, sinon utiliser sa
+	/// version async!
+	/// </remarks>
 	public static T? LoadResource<T>(
 		string path,
 		string name,
