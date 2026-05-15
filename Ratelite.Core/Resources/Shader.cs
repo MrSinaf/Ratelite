@@ -26,9 +26,9 @@ public class Shader : IResourceAsync<Shader>
 	public static Shader Load(VaultRessource ress)
 	{
 		using var reader = new StreamReader(ress.stream);
-		var shadxy = reader.ReadToEnd();
+		var shad = reader.ReadToEnd();
 		
-		var (vertexShader, fragmentShader) = ShaderFactory.Build(shadxy);
+		var (vertexShader, fragmentShader) = Utils.ShaderFactory.Build(shad);
 		var layout = """
 					 layout(std140) uniform Default {
 					     float time;
@@ -44,16 +44,16 @@ public class Shader : IResourceAsync<Shader>
 		return new Shader(
 			vertexShader,
 			fragmentShader,
-			ShaderFactory.ExtractUniformsWithDefaultValue(shadxy)
+			Utils.ShaderFactory.ExtractUniformsWithDefaultValue(shad)
 		);
 	}
 	
 	public static async Task<Shader> LoadAsync(VaultRessource ress)
 	{
 		using var reader = new StreamReader(ress.stream);
-		var shadxy = await reader.ReadToEndAsync();
+		var shad = await reader.ReadToEndAsync();
 		
-		var (vertexShader, fragmentShader) = ShaderFactory.Build(shadxy);
+		var (vertexShader, fragmentShader) = Utils.ShaderFactory.Build(shad);
 		var layout = """
 					 layout(std140) uniform Default {
 					     float time;
@@ -68,7 +68,7 @@ public class Shader : IResourceAsync<Shader>
 		Shader? shader = null;
 		MainThread.Enqueue(() => shader = new Shader(
 			vertexShader, fragmentShader,
-			ShaderFactory.ExtractUniformsWithDefaultValue(shadxy)
+			Utils.ShaderFactory.ExtractUniformsWithDefaultValue(shad)
 		));
 		await MainThread.Wait();
 		return shader ?? throw new NullReferenceException();

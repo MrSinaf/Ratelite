@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Ratelite.Resources;
+namespace Ratelite.Utils;
 
 public static partial class ShaderFactory
 {
