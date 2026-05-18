@@ -47,7 +47,7 @@ public class Layout : UIElement
 		}
 	}
 	
-	public Layout() => isInteractif = false;
+	public Layout() => isInteractive = false;
 	
 	public override void AddChild(UIElement element)
 	{
@@ -82,7 +82,7 @@ public class Layout : UIElement
 		for (var i = 0; i < array.Length; i++)
 		{
 			var child = array[i];
-			if (child.isActif)
+			if (child.isActive)
 				SetChild(child, i);
 		}
 		

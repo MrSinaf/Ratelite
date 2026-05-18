@@ -15,7 +15,7 @@ public class UIElement
 	public UIElement this[int index] => children[index];
 	public UIElement[] childrenArray => children.ToArray();
 	
-	public bool isActif => active;
+	public bool isActive => active;
 	public bool canDraw => isObservable && visible &&
 						   material is not null && mesh is { isValid: true };
 	public bool isObservable => clipArea.size != Vector2Int.zero;
@@ -34,7 +34,7 @@ public class UIElement
 	public bool isCursorOver { get; private set; }
 	
 	public bool captureCursorEvent { get; set; } = true;
-	public bool isInteractif { get; set; } = true;
+	public bool isInteractive { get; set; } = true;
 	public bool visible { get; set; } = true;
 	
 	public virtual Mesh? mesh { get; set; }
@@ -255,7 +255,7 @@ public class UIElement
 	
 	internal void InternalUpdate(UIElement parent, Stack<UIElement>? stackElementHover)
 	{
-		if (!isActif)
+		if (!isActive)
 			return;
 		
 		BeginUpdate();
@@ -288,7 +288,7 @@ public class UIElement
 	
 	internal void InternalRender()
 	{
-		if (!isActif)
+		if (!isActive)
 			return;
 		
 		BeginRender();

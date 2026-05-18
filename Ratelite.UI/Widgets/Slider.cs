@@ -39,7 +39,7 @@ public class Slider : UIElement
 	{
 		this.onCursorChanged = onCursorChanged;
 		this.orientation = orientation;
-		base.AddChild(cursor = new UIElement { isInteractif = false });
+		base.AddChild(cursor = new UIElement { isInteractive = false });
 		
 		Window.current.mouseButtonPressed += OnMouseButtonPressed;
 		Window.current.mouseButtonReleased += OnMouseButtonReleased;

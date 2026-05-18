@@ -105,10 +105,10 @@ public class TextInput : UIElement
 		mask.AddChild(placeholderLabel = new Label { name = "placeholder" });
 		mask.AddChild(valueLabel = new Label { name = "value" });
 		valueLabel.AddChild(
-			caret = new UIElement { name = "caret", visible = false, isInteractif = false }
+			caret = new UIElement { name = "caret", visible = false, isInteractive = false }
 		);
 		valueLabel.AddChild(
-			selection = new UIElement { name = "selection", visible = false, isInteractif = false }
+			selection = new UIElement { name = "selection", visible = false, isInteractive = false }
 		);
 		base.AddChild(mask);
 		

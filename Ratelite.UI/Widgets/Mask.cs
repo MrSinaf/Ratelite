@@ -8,7 +8,7 @@ public class Mask : UIElement
 	public bool masked = true;
 	
 	public Mask()
-		=> isInteractif = false;
+		=> isInteractive = false;
 	
 	protected override void BeginRender()
 	{
