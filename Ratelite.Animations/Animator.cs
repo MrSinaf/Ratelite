@@ -6,7 +6,7 @@ public class Animator<T> : IUpdatableComponent
 	public bool enable { get; set; }
 	
 	public AnimationController<T> controller { get; private set; }
-	public AnimationBlock<T>? animationBlock { get; private set; }
+	public IBlock? block { get; private set; }
 	
 	public float currentTime { get; private set; }
 	public bool isRunning { get; private set; }
@@ -32,7 +32,7 @@ public class Animator<T> : IUpdatableComponent
 	{
 		this.obj = obj;
 		this.controller = controller;
-		animationBlock = controller.firstBlock;
+		block = controller.firstBlock;
 		
 		if (autoPlay)
 			Play();
@@ -40,32 +40,42 @@ public class Animator<T> : IUpdatableComponent
 		return this;
 	}
 	
-	public void SetAnimationBlock(string name)
+	public void SetBlock(string name)
 	{
 		Stop();
-		animationBlock = controller.GetBlock(name);
+		block = controller.GetAnimationBlock(name);
 		Play();
 	}
 	
 	public void Update()
 	{
-		if (animationBlock == null || !isRunning)
+		if (!isRunning)
 			return;
 		
-		currentTime += Time.delta;
-		animationBlock.animation.Sample(obj, currentTime);
-		
-		if (currentTime > animationBlock.animation.duration)
+		switch (block)
 		{
-			if (animationBlock.animation.loop)
+			case AnimationBlock<T> animationBlock:
 			{
-				currentTime = 0;
-				animationBlock.animation.ResetTracks();
+				currentTime += Time.delta;
+				animationBlock.animation.Sample(obj, currentTime);
+				
+				if (currentTime > animationBlock.animation.duration)
+				{
+					if (animationBlock.animation.loop)
+					{
+						currentTime = 0;
+						animationBlock.animation.ResetTracks();
+					}
+					else
+						isRunning = false;
+				}
+				
+				animationBlock.onUpdate(this, obj);
+				break;
 			}
-			else
-				isRunning = false;
+			case ConditionBlock<T> conditionBlock:
+				conditionBlock.onUpdate(this, obj);
+				break;
 		}
-		
-		animationBlock.onUpdate(this, obj);
 	}
 }
