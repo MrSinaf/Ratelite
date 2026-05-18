@@ -8,6 +8,8 @@ public class ScrollView : UIElement
 	
 	private readonly UIElement content;
 	
+	public float scrollSpeed = 10;
+	
 	public ScrollView(
 		UIElement content,
 		bool withHorizontal = true,
@@ -44,13 +46,13 @@ public class ScrollView : UIElement
 	{
 		if (isCursorOver)
 		{
-			verticalScroll.cursorPosition += delta.y;
-			horizontalScroll.cursorPosition += delta.x;
+			verticalScroll.cursorPosition += delta.y * scrollSpeed;
+			horizontalScroll.cursorPosition += delta.x * scrollSpeed;
 		}
 		else if (horizontalScroll.isCursorOver)
-			horizontalScroll.cursorPosition += delta.x;
+			horizontalScroll.cursorPosition += delta.x * scrollSpeed;
 		else if (verticalScroll.isCursorOver)
-			verticalScroll.cursorPosition += delta.y;
+			verticalScroll.cursorPosition += delta.y * scrollSpeed;
 	}
 	
 	private void OnChanged(UIElement _)

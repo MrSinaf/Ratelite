@@ -94,7 +94,6 @@ public class Layout : UIElement
 		element.ForceUpdate(this);
 		
 		var spacing = index == 0 ? 0 : this.spacing;
-		anchorMax = anchorMin;	// S'assure que les anchors sont identiques.
 		
 		if (orientation == Orientation.Vertical)
 		{
@@ -114,7 +113,6 @@ public class Layout : UIElement
 				element.anchorMin = new Vector2(element.anchorMin.x, 0);
 				element.anchorMax = new Vector2(element.anchorMax.x, 0);
 			}
-			
 			size = new Vector2(
 				size.x < element.realSize.x ? element.realSize.x : size.x,
 				size.y + element.realSize.y + spacing

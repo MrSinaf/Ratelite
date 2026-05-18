@@ -30,7 +30,8 @@ public static class UIPrefab
 		if (name == null)
 			return;
 		
-		if (!prefabs.TryGetValue(typeof(T), out var actions))
+		if (!prefabs.TryGetValue(typeof(T), out var actions) || 
+			!actions.TryGetValue(name, out var action))
 		{
 			if (name == string.Empty)
 			{
@@ -53,10 +54,7 @@ public static class UIPrefab
 			);
 		}
 		
-		if (actions.TryGetValue(name, out var action))
-			action.Invoke(element);
-		else
-			throw new NullReferenceException(">" + name + "< is not a valid prefab name!");
+		action.Invoke(element);
 	}
 	
 	public static void WithPrefrab<T>(this T element, string name) where T : UIElement
