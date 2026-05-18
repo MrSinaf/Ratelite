@@ -4,6 +4,8 @@ namespace Ratelite.UI;
 
 public class UIElement
 {
+	public readonly ComponentSystem components = new ();
+	
 	public string name = string.Empty;
 	
 	public UIElement? parent { get; private set; }
@@ -257,6 +259,7 @@ public class UIElement
 			return;
 		
 		BeginUpdate();
+		components.Update();
 		if (this.parent != parent)
 		{
 			this.parent = parent;
@@ -289,6 +292,7 @@ public class UIElement
 			return;
 		
 		BeginRender();
+		components.Render();
 		if (canDraw)
 		{
 			material!.ApplyProperties();
