@@ -17,6 +17,15 @@ public struct Vector2Int(int x, int y) : IEquatable<Vector2Int>, ILerpable<Vecto
 	public float length => MathF.Sqrt(x * x + y * y);
 	public int lengthSquared => x * x + y * y;
 	
+	public Vector2 aspect
+	{
+		get
+		{
+			var max = float.Max(Math.Abs(x), Math.Abs(y));
+			return max == 0 ? zero : new Vector2(x / max, y / max);
+		}
+	}
+	
 	public Vector2Int(int xy) : this(xy, xy) { }
 	
 	public Vector2 ToVector2() => new (x, y);
