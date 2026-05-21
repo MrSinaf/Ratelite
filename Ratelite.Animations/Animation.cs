@@ -1,6 +1,6 @@
 namespace Ratelite.Animations;
 
-public class Animation<T>
+public class Animation<T> : IAsset
 {
 	private readonly List<IAnimationTrack<T>> animationTracks = [];
 	
