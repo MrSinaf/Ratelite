@@ -11,7 +11,7 @@ void mainVertex(in vec2 a_position, in vec2 a_texCoord, out vec2 v_fragCoord) {
 }
 
 void mainFragment(in vec2 v_fragCoord, out vec4 o_fragColor) {
-    o_fragColor = texture(u_texture, u_uv.xy + v_fragCoord * u_uv.zw);    
+    o_fragColor = texture(u_texture, mix(u_uv.xy, u_uv.zw, v_fragCoord));   
     o_fragColor.rgb *= u_tint.rgb;
     o_fragColor.a *= (u_alpha * u_tint.a);
 }

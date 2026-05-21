@@ -17,9 +17,9 @@ public class MaterialObject(Shader? shader = null, params (string, object)[] pro
 		return this;
 	}
 	
-	public MaterialObject SetUVRect(Rect rect)
+	public MaterialObject SetUVRegion(Region region)
 	{
-		SetProperty(UV_RECT, rect);
+		SetProperty(UV_RECT, region);
 		return this;
 	}
 	
