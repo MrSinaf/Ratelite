@@ -24,6 +24,12 @@ public class Image : UIElement
 		new MaterialUI()
 	) { }
 	
+	public Image(Texture2D texture, RectInt uv) : this(texture, new MaterialUI())
+	{
+		base.uv = texture.GetUVRegion(uv);
+		base.size = uv.size;
+	}
+	
 	public Image()
 	{
 		base.mesh = Vault.GetAsset<Mesh>(UIModule.DEFAULT_MESH);
