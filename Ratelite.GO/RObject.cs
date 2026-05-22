@@ -80,6 +80,7 @@ public class RObject
 	
 	internal void InternalUpdate()
 	{
+		Update();
 		components.Update();
 	}
 	
