@@ -117,7 +117,14 @@ public class SplashWindow
 	
 	private void Render()
 	{
-		MainThread.ExecuteAll();
+		try
+		{
+			MainThread.ExecuteAll();
+		}
+		catch (Exception e)
+		{
+			Log.Write("Failed in MainThread (；′⌒`)", e);
+		}
 		currentProgress = float.Lerp(
 			currentProgress,
 			progress,
