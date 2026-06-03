@@ -58,40 +58,8 @@ public class VaultDebug
 		if (ImGui.BeginChild("SelectAsset"))
 		{
 			if (asset.assetRef.asset is Texture2D texture)
-			{
-				float sizeInBytes = texture.size.x * texture.size.y * 4;
-				string sizeText;
-				if (sizeInBytes < 1048576F)
-				{
-					var sizeInKo = sizeInBytes / 1024f;
-					sizeText = $"{sizeInKo:F2} Ko";
-				}
-				else
-				{
-					var sizeInMo = sizeInBytes / 1048576F;
-					sizeText = $"{sizeInMo:F2} Mo";
-				}
-				ImGui.Text(sizeText);
-				
-				ImGui.Spacing();
-				
-				var availableWidth = ImGui.GetContentRegionAvail().x;
-				var imageHeight = availableWidth * texture.size.y / texture.size.x;
-				var imageSize = new Vector2(availableWidth, imageHeight);
-				var cursorScreenPos = ImGui.GetCursorScreenPos();
-				
-				var drawList = ImGui.GetWindowDrawList();
-				drawList.AddRectFilled(
-					cursorScreenPos,
-					cursorScreenPos + imageSize,
-					ImGui.GetColorU32(ImGuiCol.FrameBg)
-				);
-				
-				ImGui.Image(
-					(IntPtr)texture.gTexture.handle,
-					imageSize
-				);
-			}
+				Texture2D_Property(texture);
+			
 			ImGui.EndChild();
 		}
 	}
@@ -119,7 +87,22 @@ public class VaultDebug
 				ImGui.BeginGroup();
 				ImGui.PushID(name);
 				{
-					ImGui.Button($"##{name}_thumb", new Vector2(thumbnailSize));
+					var thumbBoxSize = new Vector2(thumbnailSize);
+					var thumbStart = ImGui.GetCursorScreenPos();
+					
+					ImGui.InvisibleButton($"##{name}_thumb", thumbBoxSize);
+					
+					var drawList = ImGui.GetWindowDrawList();
+					drawList.AddRectFilled(
+						thumbStart,
+						thumbStart + thumbBoxSize,
+						ImGui.GetColorU32(ImGuiCol.FrameBg),
+						4f
+					);
+					
+					if (assetRef.asset is Texture2D texture)
+						Texture2D_Thumbnail(texture, drawList, thumbStart);
+					
 					ImGui.SameLine();
 					
 					ImGui.BeginGroup();
@@ -140,5 +123,65 @@ public class VaultDebug
 			}
 			ImGui.EndChild();
 		}
+	}
+	
+	private void Texture2D_Thumbnail(Texture2D texture, ImDrawListPtr drawList, Vector2 thumbStart)
+	{
+		var textureWidth = texture.size.x;
+		var textureHeight = texture.size.y;
+		
+		var scale = MathF.Min(
+			1f * thumbnailSize / textureWidth,
+			1f * thumbnailSize / textureHeight
+		);
+		
+		var imageSize = new Vector2(
+			textureWidth * scale,
+			textureHeight * scale
+		);
+		
+		var imagePos = thumbStart + (new Vector2(thumbnailSize) - imageSize) * 0.5f;
+		
+		drawList.AddImage(
+			(IntPtr)texture.gTexture.handle,
+			imagePos,
+			imagePos + imageSize
+		);
+	}
+	
+	private void Texture2D_Property(Texture2D texture)
+	{
+		float sizeInBytes = texture.size.x * texture.size.y * 4;
+		string sizeText;
+		if (sizeInBytes < 1048576F)
+		{
+			var sizeInKo = sizeInBytes / 1024f;
+			sizeText = $"{sizeInKo:F2} Ko";
+		}
+		else
+		{
+			var sizeInMo = sizeInBytes / 1048576F;
+			sizeText = $"{sizeInMo:F2} Mo";
+		}
+		ImGui.Text($"{texture.size.x}x{texture.size.y} - " + sizeText);
+		
+		ImGui.Spacing();
+		
+		var availableWidth = ImGui.GetContentRegionAvail().x;
+		var imageHeight = availableWidth * texture.size.y / texture.size.x;
+		var imageSize = new Vector2(availableWidth, imageHeight);
+		var cursorScreenPos = ImGui.GetCursorScreenPos();
+		
+		var drawList = ImGui.GetWindowDrawList();
+		drawList.AddRectFilled(
+			cursorScreenPos,
+			cursorScreenPos + imageSize,
+			ImGui.GetColorU32(ImGuiCol.FrameBg)
+		);
+		
+		ImGui.Image(
+			(IntPtr)texture.gTexture.handle,
+			imageSize
+		);
 	}
 }
