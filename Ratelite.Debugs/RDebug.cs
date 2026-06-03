@@ -41,9 +41,17 @@ public static class RDebug
 					ImGui.EndMenu();
 				}
 				
+				
 				if (ImGui.MenuItem("Exit"))
 					R.game.window.Close();
-				
+				ImGui.EndMenu();
+			}
+			
+			
+			if (ImGui.BeginMenu("Scene"))
+			{
+				if (ImGui.MenuItem("Restart"))
+					Stage.Load((Scene)Activator.CreateInstance(Stage.current.GetType())!);
 				ImGui.EndMenu();
 			}
 		}
