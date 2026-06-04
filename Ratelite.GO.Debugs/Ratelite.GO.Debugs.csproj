@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Ratelite.Debugs\Ratelite.Debugs.csproj" />
+      <ProjectReference Include="..\Ratelite.GO\Ratelite.GO.csproj" />
+    </ItemGroup>
+
+</Project>

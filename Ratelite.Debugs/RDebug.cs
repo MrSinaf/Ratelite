@@ -7,6 +7,8 @@ public static class RDebug
 	public static bool showMenuBar = true;
 	public static VaultDebug vault = new ();
 	
+	public static event Action onMainMenuBar = delegate { };
+	
 	internal static void Render()
 	{
 		if (!showMenuBar)
@@ -47,13 +49,14 @@ public static class RDebug
 				ImGui.EndMenu();
 			}
 			
-			
 			if (ImGui.BeginMenu("Scene"))
 			{
 				if (ImGui.MenuItem("Restart"))
 					Stage.Load((Scene)Activator.CreateInstance(Stage.current.GetType())!);
 				ImGui.EndMenu();
 			}
+			
+			onMainMenuBar.Invoke();
 		}
 		ImGui.EndMainMenuBar();
 		ImGui.PopStyleVar();
