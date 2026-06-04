@@ -17,9 +17,22 @@ public class Scene
 	
 	public T AddPlugin<T>() where T : class, IPlugin, new()
 	{
-		var instance = Activator.CreateInstance<T>();
+		foreach (var plugin in plugins)
+			if (plugin.GetType() == typeof(T))
+				throw new Exception($"Plugin {typeof(T).Name} already added to scene");
+		
+		var instance = new T();
 		plugins.Add(instance);
 		return instance;
+	}
+	
+	public T GetPlugin<T>() where T : class, IPlugin
+	{
+		foreach (var plugin in plugins)
+			if (plugin is T instance)
+				return instance;
+		
+		throw new Exception($"Plugin {typeof(T).Name} not found in scene");
 	}
 	
 	internal void InternalUpdate()
