@@ -1,14 +1,16 @@
 ﻿namespace Ratelite;
 
-public class ComponentSystem
+public class ComponentSystem : ComponentSystem<IComponent>;
+
+public class ComponentSystem<T> where T : class, IComponent
 {
-	private readonly List<IComponent> components = [];
+	private readonly List<T> components = [];
 	private readonly List<IRenderableComponent> renderableComponents = [];
 	private readonly List<IUpdatableComponent> updatableComponents = [];
 	
-	public T AddComponent<T>() where T : IComponent, new()
+	public TC AddComponent<TC>() where TC : T, new()
 	{
-		var component = new T();
+		var component = new TC();
 		components.Add(component);
 		
 		component.enable = true;
@@ -25,7 +27,7 @@ public class ComponentSystem
 		return component;
 	}
 	
-	public void RemoveComponent<T>(T component) where T : IComponent
+	public void RemoveComponent<TC>(TC component) where TC : T
 	{
 		components.Remove(component);
 		
@@ -40,11 +42,11 @@ public class ComponentSystem
 		}
 	}
 	
-	public IEnumerable<T> GetComponents<T>()
-		=> components.OfType<T>();
+	public IEnumerable<TC> GetComponents<TC>() where TC : T
+		=> components.OfType<TC>();
 	
-	public T? GetComponent<T>()
-		=> (T?)components.FirstOrDefault(x => x is T);
+	public TC? GetComponent<TC>() where TC : T
+		=> components.OfType<TC>().FirstOrDefault();
 	
 	public void Update()
 	{
@@ -63,7 +65,10 @@ public class ComponentSystem
 	public void Destroy()
 	{
 		foreach (var component in components)
+		{
+			component.enable = false;
 			if (component is IDisposableComponent disposable)
 				disposable.Dispose();
+		}
 	}
 }

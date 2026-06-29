@@ -3,7 +3,7 @@
 public class Scene
 {
 	private readonly List<IPlugin> plugins = [];
-	public readonly ComponentSystem componentSystem = new();
+	public readonly ComponentSystem components = new();
 	
 	public bool isRunning { get; private set; }
 	
@@ -35,6 +35,19 @@ public class Scene
 		throw new Exception($"Plugin {typeof(T).Name} not found in scene");
 	}
 	
+	public bool TryGetPlugin<T>(out T? plugin) where T : class, IPlugin
+	{
+		foreach (var mPlugin in plugins)
+			if (mPlugin is T m)
+			{
+				plugin = m;
+				return true;
+			}
+		
+		plugin = null;
+		return false;
+	}
+	
 	internal void InternalUpdate()
 	{
 		if (!isRunning)
@@ -54,7 +67,7 @@ public class Scene
 				Log.Write($"Plugin error: ({plugin.GetType()})\n" + e.Message, Log.Level.Error);
 			}
 		}
-		componentSystem.Update();
+		components.Update();
 		Update();
 	}
 	
@@ -75,7 +88,7 @@ public class Scene
 				);
 			}
 		}
-		componentSystem.Render();
+		components.Render();
 		Render();
 	}
 	
@@ -112,6 +125,6 @@ public class Scene
 			}
 		}
 		
-		componentSystem.Destroy();
+		components.Destroy();
 	}
 }
