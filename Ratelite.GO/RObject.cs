@@ -12,7 +12,7 @@ public class RObject
 	public bool isActif => enable && !isDestroyed;
 	public bool canDraw => material != null && mesh is { isValid: true };
 	public int drawOrder;
-	public float drawDepth;
+	public float drawDepth = 1F;
 	
 	public string name;
 	public Mesh? mesh;
