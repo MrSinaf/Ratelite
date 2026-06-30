@@ -4,6 +4,7 @@ namespace Ratelite.GO;
 
 public class RObject
 {
+	// TODO > ajouter une relation d'enfant!
 	public readonly ComponentSystem components = new ();
 	
 	public bool enable = true;
@@ -11,6 +12,7 @@ public class RObject
 	public bool isActif => enable && !isDestroyed;
 	public bool canDraw => material != null && mesh is { isValid: true };
 	public int drawOrder;
+	public float drawDepth;
 	
 	public string name;
 	public Mesh? mesh;
@@ -75,6 +77,7 @@ public class RObject
 		components.Render();
 		material!.ApplyProperties();
 		material!.shader.gProgram.SetUniform("u_model", matrix);
+		material!.shader.gProgram.SetUniform("u_objectDepth", drawDepth);
 		mesh!.Draw();
 	}
 	

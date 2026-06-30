@@ -4,6 +4,7 @@ uniform sampler2D u_texture;
 uniform vec4 u_uv = vec4(0, 0, 1, 1);
 uniform vec4 u_tint = vec4(1, 1, 1, 1);
 uniform float u_alpha = 1.0;
+uniform float u_objectDepth;
 
 void mainVertex(in vec2 a_position, in vec2 a_texCoord, out vec2 v_fragCoord) {
     gl_Position = vec4(projection * u_model * vec3(a_position, 1.0), 1.0);
@@ -14,4 +15,10 @@ void mainFragment(in vec2 v_fragCoord, out vec4 o_fragColor) {
     o_fragColor = texture(u_texture, mix(u_uv.xy, u_uv.zw, v_fragCoord));   
     o_fragColor.rgb *= u_tint.rgb;
     o_fragColor.a *= (u_alpha * u_tint.a);
+    
+    if (o_fragColor.a <= 0.01) {
+        discard;
+    }
+    
+    gl_FragDepth = u_objectDepth;
 }
