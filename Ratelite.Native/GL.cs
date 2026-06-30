@@ -436,6 +436,9 @@ public static unsafe class GL
 		glClearColor(r, g, b, a);
 	}
 	
+	public static void ClearDepth(double depth)
+		=> glClearDepth(depth);
+	
 	public static void Clear(ClearBufferMask mask)
 		=> glClear(mask);
 	
@@ -450,6 +453,9 @@ public static unsafe class GL
 	
 	public static bool IsEnabled(EnableCap cap)
 		=> glIsEnabled(cap) != 0;
+	
+	public static void DepthFunc(DepthFunction function)
+		=> glDepthFunc(function);
 	
 	public static void BlendFunc(BlendingFactor sfactor, BlendingFactor dfactor)
 		=> glBlendFunc(sfactor, dfactor);

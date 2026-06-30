@@ -7,6 +7,8 @@ internal static unsafe class GLNative
 	internal static delegate*
 			unmanaged[Cdecl]<float, float, float, float, void> glClearColor;
 	internal static delegate*
+			unmanaged[Cdecl]<double, void> glClearDepth;
+	internal static delegate*
 			unmanaged[Cdecl]<ClearBufferMask, void> glClear;
 	internal static delegate*
 			unmanaged[Cdecl]<int, int, uint, uint, void> glViewport;
@@ -14,6 +16,8 @@ internal static unsafe class GLNative
 			unmanaged[Cdecl]<EnableCap, void> glEnable;
 	internal static delegate*
 			unmanaged[Cdecl]<EnableCap, void> glDisable;
+	internal static delegate*
+			unmanaged[Cdecl]<DepthFunction, void> glDepthFunc;
 	internal static delegate*
 			unmanaged[Cdecl]<BlendingFactor, BlendingFactor, void> glBlendFunc;
 	internal static delegate*
@@ -222,6 +226,8 @@ internal static unsafe class GLNative
 		isLoaded = true;
 		glClearColor = (delegate* unmanaged[Cdecl]<float, float, float, float, void>)
 				LoadProc("glClearColor");
+		glClearDepth = (delegate* unmanaged[Cdecl]<double, void>)
+				LoadProc("glClearDepth");
 		glClear = (delegate* unmanaged[Cdecl]<ClearBufferMask, void>)
 				LoadProc("glClear");
 		glViewport = (delegate* unmanaged[Cdecl]<int, int, uint, uint, void>)
@@ -230,6 +236,8 @@ internal static unsafe class GLNative
 				LoadProc("glEnable");
 		glDisable = (delegate* unmanaged[Cdecl]<EnableCap, void>)
 				LoadProc("glDisable");
+		glDepthFunc = (delegate* unmanaged[Cdecl]<DepthFunction, void>)
+				LoadProc("glDepthFunc");
 		glBlendFunc = (delegate* unmanaged[Cdecl]<BlendingFactor, BlendingFactor, void>)
 				LoadProc("glBlendFunc");
 		glGetIntegerv = (delegate* unmanaged[Cdecl]<GetPName, int*, void>)
