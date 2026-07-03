@@ -26,14 +26,14 @@ public static partial class ShaderFactory
 			{
 				case "mainVertex":
 				{
-					vertexParams.Insert(0, f.globalParams);
+					vertexParams.Insert(0, f.globalParams + "\n\n");
 					var method = f.body.Replace(f.name, "main");
 					vertexSb.Append(method).Append('\n');
 					break;
 				}
 				case "mainFragment":
 				{
-					fragmentParams.Insert(0, f.globalParams);
+					fragmentParams.Insert(0, f.globalParams + "\n\n");
 					var method = f.body.Replace(f.name, "main");
 					fragmentSb.Append(method).Append('\n');
 					break;
@@ -211,11 +211,15 @@ public static partial class ShaderFactory
 					else
 						cleanParamsList.Add(trimmed);
 				}
+				
 				globalParams = string.Join(string.Empty, formattedParamsList);
-				var originalSig = $"{functionName}({parametersText})";
-				var cleanSig = $"{functionName}({string.Join(", ", cleanParamsList)})";
-				body = src.Substring(startIndex, endIndex - startIndex + 1)
-						  .Replace(originalSig, cleanSig);
+				
+				var fullBody = src.Substring(startIndex, endIndex - startIndex + 1);
+				var signatureEndIndex = fullBody.IndexOf('{');
+				var cleanSignature = $"{m.Groups[0].Value.Split(functionName)[0]}{functionName}" +
+									 $"({string.Join(", ", cleanParamsList)}) ";
+				
+				body = cleanSignature + fullBody[signatureEndIndex..];
 			}
 			else
 				body = src.Substring(startIndex, endIndex - startIndex + 1);
