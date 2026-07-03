@@ -3,17 +3,17 @@ using Ratelite.Resources;
 
 namespace Ratelite.Debugs.Windows;
 
-public class VaultDebug
+public class VaultDebugWindow : IDebugWindow
 {
 	private readonly Dictionary<string, AssetReference> assets;
 	
-	public bool show;
+	public bool show { get; set; }
 	public (string name, AssetReference assetRef)? selectedAsset;
 	
 	private int thumbnailSize = 64;
 	private int spacing = 5;
 	
-	internal VaultDebug()
+	internal VaultDebugWindow()
 	{
 		var cacheField = typeof(Vault).GetField(
 			"assets",
@@ -22,9 +22,10 @@ public class VaultDebug
 		assets = (Dictionary<string, AssetReference>)cacheField!.GetValue(null)!;
 	}
 	
-	internal void Render()
+	public void Draw()
 	{
-		if (show && ImGui.Begin("Vault", ref show, ImGuiWindowFlags.MenuBar))
+		var refShow = show;
+		if (show && ImGui.Begin("Vault", ref refShow, ImGuiWindowFlags.MenuBar))
 		{
 			ImGui.BeginMenuBar();
 			{
@@ -50,6 +51,7 @@ public class VaultDebug
 			
 			ImGui.End();
 		}
+		show = refShow;
 	}
 	
 	private void SelectAsset()
