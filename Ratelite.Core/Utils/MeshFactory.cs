@@ -93,8 +93,9 @@ public static class MeshFactory
 			vertices[iV + 2].uv = quad.uvs.position11;
 			vertices[iV + 3].uv = new Vector2(quad.uvs.position00.x, quad.uvs.position11.y);
 		}
-		
-		mesh.vertices = vertices;
+	
+		if (mesh is Mesh<VertexPositionUV> meshPosUv)
+			meshPosUv.vertices = vertices;
 		mesh.ApplyVertex();
 		return mesh;
 	}

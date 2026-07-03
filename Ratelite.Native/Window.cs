@@ -110,6 +110,7 @@ public sealed unsafe class Window
 		EnsureInit();
 		glfwDefaultWindowHints();
 		glfwWindowHint(Hints.TRANSPARENT_FRAMEBUFFER, options.transparent ? 1 : 0);
+		glfwWindowHint(Hints.DEPTH_BITS, 24);
 		
 		Console.OutputEncoding = Encoding.UTF8;
 		var monitor = options.fullscreen ? glfwGetPrimaryMonitor() : null;
@@ -148,6 +149,8 @@ public sealed unsafe class Window
 		
 		GLNative.Load();
 		GL.Enable(EnableCap.Blend);
+		GL.Enable(EnableCap.DepthTest);
+		GL.DepthFunc(DepthFunction.Lequal);
 		GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 		
 		start();
@@ -274,7 +277,7 @@ public sealed unsafe class Window
 	
 	private void Render()
 	{
-		GL.Clear(ClearBufferMask.ColorBufferBit);
+		GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 		render();
 		SwapBuffers();
 	}

@@ -34,4 +34,10 @@ public class MaterialObject(Shader? shader = null, params (string, object)[] pro
 		SetProperty(TINT, color);
 		return this;
 	}
+	
+	public new MaterialObject SetProperty(string name, object value)
+	{
+		base.SetProperty(name, value);
+		return this;
+	}
 }

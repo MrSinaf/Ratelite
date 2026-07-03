@@ -1,4 +1,5 @@
 ﻿using Ratelite.Rendering;
+using Ratelite.Utils;
 
 namespace Ratelite.Resources;
 
@@ -28,7 +29,7 @@ public class Shader : IResourceAsync<Shader>
 		using var reader = new StreamReader(ress.stream);
 		var shad = reader.ReadToEnd();
 		
-		var (vertexShader, fragmentShader) = Utils.ShaderFactory.Build(shad);
+		var (vertexShader, fragmentShader) = ShaderFactory.Build(shad);
 		var layout = """
 					 layout(std140) uniform Default {
 					     float time;
@@ -44,7 +45,7 @@ public class Shader : IResourceAsync<Shader>
 		return new Shader(
 			vertexShader,
 			fragmentShader,
-			Utils.ShaderFactory.ExtractUniformsWithDefaultValue(shad)
+			ShaderFactory.ExtractUniformsWithDefaultValue(shad)
 		);
 	}
 	

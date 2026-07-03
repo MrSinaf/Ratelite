@@ -103,7 +103,7 @@ public class Label : UIElement
 			position.x += glyph.advance;
 		}
 		
-		if (mesh?.vertices.Length == text.Length * 4)
+		if (mesh?.nVertices == text.Length * 4)
 			MeshFactory.SetQuadsVertices(mesh, meshes);
 		else
 		{

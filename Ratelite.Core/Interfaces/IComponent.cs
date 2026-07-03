@@ -5,7 +5,6 @@ namespace Ratelite;
 [UsedImplicitly]
 public interface IComponent
 {
-	public int priority { get; }
 	public bool enable { get; set; }
 }
 

@@ -3,26 +3,23 @@ using Ratelite.Rendering;
 
 namespace Ratelite.Resources;
 
-// TODO > Le rendre pénétrable... (⊙x⊙;) par n'importe quel type de Vertex !
-public class Mesh : IAsset, IDisposable
+public abstract class Mesh : IAsset, IDisposable
 {
-	public GVertexArrayObject vao { get; private set; } = null!;
-	private GBuffer<byte> vertexBuffer = null!;
-	private GBuffer<uint> indexBuffer = null!;
-	
 	public required uint[] indices;
-	public required VertexPositionUV[] vertices;
 	
-	public Region bounds { get; private set; }
+	public GVertexArrayObject vao { get; protected set; } = null!;
+	public Region bounds { get; protected set; }
 	public bool isValid => !isDisposed;
 	
+	public abstract int nVertices { get; }
+	
+	protected GBuffer<byte> vertexBuffer = null!;
+	protected GBuffer<uint> indexBuffer = null!;
 	private bool isDisposed;
 	
-	private Mesh() { }
-	
-	public static Mesh Create(VertexPositionUV[] vertices, uint[] indices)
+	public static Mesh Create<T>(T[] vertices, uint[] indices) where T : unmanaged, IVertex
 	{
-		var mesh = new Mesh
+		var mesh = new Mesh<T>
 		{
 			vertices = vertices,
 			indices = indices
@@ -32,23 +29,12 @@ public class Mesh : IAsset, IDisposable
 		return mesh;
 	}
 	
-	/* TODO
-	 * Quand on passe du SplashWindow au GameWindow si un mesh avait été chargé il doit rebindé
-	 * son VAO car il n'est pas partagé dans le OpenGL context (っ °Д °;)っ...
-	 * Évidemment faut voir comment automatiser ceci efficacement!
-	 */
-	public void RebindVAO()
-	{
-		if (!isValid)
-			return;
-		
-		MainThread.Assert();
-		vao.Dispose();
-		
-		vertexBuffer.Bind();
-		vao = VertexPositionUV.GetVAO();
-		indexBuffer.Bind();
-	}
+	public abstract void ApplyVertex();
+	public abstract void ApplyVertex(int offset, int length);
+	public abstract void ApplyIndices();
+	public abstract void ApplyIndices(int offset, int length);
+	protected abstract void CreateBuffer();
+	protected abstract void UpdateBounds();
 	
 	public void Draw()
 	{
@@ -63,27 +49,47 @@ public class Mesh : IAsset, IDisposable
 		);
 	}
 	
-	public void ApplyVertex() => ApplyVertex(0, vertices.Length);
+	public void Dispose()
+	{
+		if (isDisposed)
+			return;
+		
+		vao.Dispose();
+		vertexBuffer.Dispose();
+		indexBuffer.Dispose();
+		
+		isDisposed = true;
+		GC.SuppressFinalize(this);
+	}
+}
+
+public class Mesh<T> : Mesh where T : unmanaged, IVertex
+{
+	public required T[] vertices;
 	
-	public void ApplyVertex(int offset, int length)
+	public override int nVertices => vertices.Length;
+	
+	public override void ApplyVertex() => ApplyVertex(0, vertices.Length);
+	
+	public override void ApplyVertex(int offset, int length)
 	{
 		unsafe
 		{
-			fixed (VertexPositionUV* ptr = vertices.AsSpan(offset, length))
+			fixed (T* ptr = vertices.AsSpan(offset, length))
 			{
 				vertexBuffer.Set(
-					(uint)(offset * sizeof(VertexPositionUV)),
+					(uint)(offset * sizeof(T)),
 					(byte*)ptr,
-					(uint)(length * sizeof(VertexPositionUV))
+					(uint)(length * sizeof(T))
 				);
 			}
 		}
 		UpdateBounds();
 	}
 	
-	public void ApplyIndices() => ApplyIndices(0, indices.Length);
+	public override void ApplyIndices() => ApplyIndices(0, indices.Length);
 	
-	public void ApplyIndices(int offset, int length)
+	public override void ApplyIndices(int offset, int length)
 	{
 		unsafe
 		{
@@ -94,18 +100,18 @@ public class Mesh : IAsset, IDisposable
 		}
 	}
 	
-	private unsafe void CreateBuffer()
+	protected override unsafe void CreateBuffer()
 	{
-		fixed (VertexPositionUV* ptr = vertices.AsSpan())
+		fixed (T* ptr = vertices.AsSpan())
 		{
 			vertexBuffer = new GBuffer<byte>(
 				BufferType.VertexBuffer,
-				(uint)(vertices.Length * sizeof(VertexPositionUV)),
+				(uint)(vertices.Length * sizeof(T)),
 				ptr,
 				true
 			);
 		}
-		vao = VertexPositionUV.GetVAO();
+		vao = T.GetVAO();
 		fixed (uint* ptr = indices.AsSpan())
 		{
 			indexBuffer = new GBuffer<uint>(
@@ -119,7 +125,7 @@ public class Mesh : IAsset, IDisposable
 		UpdateBounds();
 	}
 	
-	private void UpdateBounds()
+	protected override void UpdateBounds()
 	{
 		if (vertices.Length == 0)
 		{
@@ -143,21 +149,26 @@ public class Mesh : IAsset, IDisposable
 		bounds = new Region(min, max);
 	}
 	
-	public void Dispose()
+	/* TODO
+	 * Quand on passe du SplashWindow au GameWindow si un mesh avait été chargé il doit rebindé
+	 * son VAO car il n'est pas partagé dans le OpenGL context (っ °Д °;)っ...
+	 * Évidemment faut voir comment automatiser ceci efficacement!
+	 */
+	public void RebindVAO()
 	{
-		if (isDisposed)
+		if (!isValid)
 			return;
 		
+		MainThread.Assert();
 		vao.Dispose();
-		vertexBuffer.Dispose();
-		indexBuffer.Dispose();
 		
-		isDisposed = true;
-		GC.SuppressFinalize(this);
+		vertexBuffer.Bind();
+		vao = T.GetVAO();
+		indexBuffer.Bind();
 	}
 }
 
-public struct VertexPositionUV
+public struct VertexPositionUV : IVertex
 {
 	public Vector2 position { get; set; }
 	public Vector2 uv { get; set; }
