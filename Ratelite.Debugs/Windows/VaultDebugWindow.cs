@@ -59,6 +59,9 @@ public class VaultDebugWindow : IDebugWindow
 		var asset = selectedAsset!.Value;
 		if (ImGui.BeginChild("SelectAsset"))
 		{
+			if (asset.assetRef.asset is IHotReloadResource && ImGui.Button("Hot Reload"))
+				Vault.HotReloadAsset(asset.name);
+			
 			if (asset.assetRef.asset is Texture2D texture)
 				Texture2D_Property(texture);
 			

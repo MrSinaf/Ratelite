@@ -3,7 +3,7 @@ using Ratelite.Rendering;
 
 namespace Ratelite.Resources;
 
-public class Texture2D : Texture, IResourceAsync<Texture2D>, IDisposable
+public class Texture2D : Texture, IHotReloadResourceAsync, IResourceAsync<Texture2D>, IDisposable
 {
 	public static readonly Config internalConfig = new (
 		TextureMin.Nearest,
@@ -35,6 +35,8 @@ public class Texture2D : Texture, IResourceAsync<Texture2D>, IDisposable
 		SetWrap(config.wrap);
 	}
 	
+	public void Apply() => gTexture.SetSubImage2D(0, 0, (uint)size.x, (uint)size.y, pixels);
+	
 	public Region GetUVRegion(RectInt target)
 		=> new (target.position * texel, (target.position + target.size) * texel);
 	
@@ -59,6 +61,27 @@ public class Texture2D : Texture, IResourceAsync<Texture2D>, IDisposable
 			Color.AsColors(image.data).ToArray(),
 			ress.config as Config
 		);
+	}
+	
+	public void HotReload(Stream stream)
+	{
+		var image = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
+		var newPixels = Color.AsColors(image.data);
+		for (var i = 0; i < newPixels.Length; i++)
+			pixels[i] = newPixels[i];
+		
+		Apply();
+	}
+	
+	public async Task HotReloadAsync(Stream stream)
+	{
+		var image = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
+		var newPixels = Color.AsColors(image.data);
+		for (var i = 0; i < newPixels.Length; i++)
+			pixels[i] = newPixels[i];
+		
+		MainThread.Enqueue(Apply);
+		await MainThread.Wait();
 	}
 	
 	public static async Task<Texture2D> LoadAsync(VaultRessource ress)
