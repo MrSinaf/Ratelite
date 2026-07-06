@@ -117,18 +117,7 @@ public class GTexture : IDisposable
 	public unsafe void SetSubImage2D(int x, int y, uint width, uint height, Color[] colors)
 	{
 		Bind();
-		
-		var bytes = new List<byte>();
-		
-		foreach (var color in colors)
-		{
-			bytes.Add(color.r);
-			bytes.Add(color.g);
-			bytes.Add(color.b);
-			bytes.Add(color.a);
-		}
-		
-		fixed (byte* ptr = bytes.ToArray())
+		fixed (Color* ptr = colors.ToArray())
 		{
 			GL.TexSubImage2D(
 				TARGET,
