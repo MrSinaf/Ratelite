@@ -5,6 +5,8 @@ public class Scene
 	private readonly List<IPlugin> plugins = [];
 	public readonly ComponentSystem components = new();
 	
+	public static event Action onSceneInitialized = delegate { };
+	
 	public bool isRunning { get; private set; }
 	
 	public virtual void Init() { }
@@ -108,6 +110,7 @@ public class Scene
 		}
 		Start();
 		isRunning = true;
+		onSceneInitialized();
 	}
 	
 	internal void InternalUnload()
