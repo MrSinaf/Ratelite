@@ -23,6 +23,14 @@ public static class RDebug
 	
 	internal static void Render()
 	{
+		MainMenuBar();
+		
+		foreach (var (_, window) in windows)
+			window.Draw();
+	}
+	
+	private static void MainMenuBar()
+	{
 		if (!showMenuBar)
 			return;
 		
@@ -91,8 +99,5 @@ public static class RDebug
 		ImGui.EndMainMenuBar();
 		ImGui.PopStyleVar();
 		ImGui.PopStyleColor();
-		
-		foreach (var (_, window) in windows)
-			window.Draw();
 	}
 }
