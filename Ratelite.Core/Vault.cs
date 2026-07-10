@@ -6,7 +6,63 @@ public static class Vault
 {
 	private static readonly Dictionary<string, AssetReference> assets = [];
 	
+	public static string projectRoot;
 	public static bool ContainsAsset(string name) => assets.ContainsKey(name);
+	
+	static Vault()
+	{
+		var directory = new DirectoryInfo(AppContext.BaseDirectory);
+		while (directory != null)
+		{
+			if (directory.GetFiles("*.csproj").Length > 0)
+			{
+				projectRoot = directory.FullName;
+				return;
+			}
+			directory = directory.Parent;
+		}
+		projectRoot = Directory.GetCurrentDirectory();
+	}
+	
+	public static void HotReloadAsset(string name)
+	{
+		if (assets.TryGetValue(name, out var assetRef) &&
+			assetRef is { initialPath: not null, asset: IHotReloadResource asset })
+		{
+			var fullPath = Path.Combine(projectRoot, "assets", assetRef.initialPath);
+			if (!File.Exists(fullPath))
+				throw new FileNotFoundException(
+					$"The resource '{assetRef.initialPath}' does not exist! (￣_￣|||)"
+				);
+			
+			using var stream = File.OpenRead(fullPath);
+			try
+			{
+				asset.HotReload(stream);
+				Log.Write($"Hot reloaded asset '{name}' (○｀ 3′○)", Log.Level.Info);
+			}
+			catch (Exception e)
+			{
+				Log.Write($"Failed to hot reload asset '{name}'", e, true);
+			}
+		}
+	}
+	
+	public static async Task HotReloadAssetAsync(string name)
+	{
+		if (assets.TryGetValue(name, out var assetRef) &&
+			assetRef is { initialPath: not null, asset: IHotReloadResourceAsync asset })
+		{
+			var fullPath = Path.Combine(projectRoot, "assets", assetRef.initialPath);
+			if (!File.Exists(fullPath))
+				throw new FileNotFoundException(
+					$"The resource '{assetRef.initialPath}' does not exist! (￣_￣|||)"
+				);
+			
+			await using var stream = File.OpenRead(fullPath);
+			await asset.HotReloadAsync(stream);
+		}
+	}
 	
 	public static T? GetAsset<T>(string name) where T : class, IAsset
 		=> TryGetAsset<T>(name, out var asset)
@@ -16,9 +72,15 @@ public static class Vault
 					$"(>ლ) Use '{nameof(TryGetAsset)}' to check if it exists!"
 				);
 	
-	public static bool AddAsset<T>(string name, T asset) where T : class, IAsset
+	public static bool AddAsset<T>(
+		string name,
+		T asset,
+		string? initialPath = null,
+		IResourceConfig? config = null
+	)
+			where T : class, IAsset
 	{
-		if (!assets.TryAdd(name, new AssetReference(asset)))
+		if (!assets.TryAdd(name, new AssetReference(asset, initialPath)))
 		{
 			Log.Write(
 				$"You are trying to add asset `{name}`, but it is already present in the cache!" +
@@ -42,11 +104,17 @@ public static class Vault
 		}
 	}
 	
-	public static bool ReplaceAsset<T>(string name, T asset) where T : class, IAsset
+	public static bool ReplaceAsset<T>(
+		string name,
+		T asset,
+		string? initialPath = null,
+		IResourceConfig? config = null
+	)
+			where T : class, IAsset
 	{
 		var contains = assets.ContainsKey(name);
 		if (contains)
-			assets[name] = new AssetReference(asset);
+			assets[name] = new AssetReference(asset, initialPath);
 		
 		return contains;
 	}
@@ -130,7 +198,7 @@ public static class Vault
 		
 		using var stream = File.OpenRead(fullPath);
 		var asset = T.Load(new VaultRessource(stream, extension, config));
-		AddAsset(name, asset);
+		AddAsset(name, asset, path, config);
 		
 		return asset;
 	}
@@ -166,7 +234,7 @@ public static class Vault
 		
 		await using var stream = File.OpenRead(fullPath);
 		var asset = await T.LoadAsync(new VaultRessource(stream, extension, config));
-		AddAsset(name, asset);
+		AddAsset(name, asset, path, config);
 		
 		return asset;
 	}
@@ -254,7 +322,7 @@ public static class Vault
 			);
 		
 		var asset = T.Load(new VaultRessource(stream, extension, config));
-		AddAsset(name, asset);
+		AddAsset(name, asset, path, config);
 		return asset;
 	}
 	
@@ -295,14 +363,21 @@ public static class Vault
 			);
 		
 		var asset = await T.LoadAsync(new VaultRessource(stream, extension, config));
-		AddAsset(name, asset);
+		AddAsset(name, asset, path);
 		return asset;
 	}
 }
 
-public class AssetReference(object asset)
+public class AssetReference
 {
-	public readonly object asset = asset;
+	public readonly object asset;
+	public string? initialPath;
+	
+	internal AssetReference(object asset, string? initialPath)
+	{
+		this.asset = asset;
+		this.initialPath = initialPath;
+	}
 }
 
 public interface IResourceConfig;
