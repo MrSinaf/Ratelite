@@ -19,6 +19,8 @@ public struct Vector3Int(int x, int y, int z) : IEquatable<Vector3Int>, ILerpabl
 	
 	public float length => MathF.Sqrt(x * x + y * y + z * z);
 	public int lengthSquared => x * x + y * y + z * z;
+	public int maxValue => (int)MathF.Max(x, MathF.Max(y, z));
+	public int minValue => (int)MathF.Min(x, MathF.Min(y, z));
 	
 	public Vector3Int(int xyz) : this(xyz, xyz, xyz) { }
 	public Vector3Int(Vector2Int xy, int z) : this(xy.x, xy.y, z) { }

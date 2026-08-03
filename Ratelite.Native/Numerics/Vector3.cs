@@ -21,6 +21,8 @@ public struct Vector3(float x, float y, float z) : IEquatable<Vector3>, ILerpabl
 	
 	public float lengthSquared => x * x + y * y + z * z;
 	public float length => MathF.Sqrt(lengthSquared);
+	public float maxValue => MathF.Max(x, MathF.Max(y, z));
+	public float minValue => MathF.Min(x, MathF.Min(y, z));
 	
 	public Vector3 normalized
 	{

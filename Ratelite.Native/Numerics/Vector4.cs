@@ -14,6 +14,8 @@ public struct Vector4(float x, float y, float z, float w) : IEquatable<Vector4>,
 	
 	public float lengthSquared => x * x + y * y + z * z + w * w;
 	public float length => MathF.Sqrt(lengthSquared);
+	public float maxValue => MathF.Max(x, MathF.Max(y, MathF.Max(z, w)));
+	public float minValue => MathF.Min(x, MathF.Min(y, MathF.Min(z, w)));
 	
 	public Vector4 normalized
 	{

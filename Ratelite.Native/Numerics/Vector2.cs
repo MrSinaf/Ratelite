@@ -18,6 +18,8 @@ public struct Vector2(float x, float y) : IEquatable<Vector2>, ILerpable<Vector2
 	
 	public float lengthSquared => x * x + y * y;
 	public float length => MathF.Sqrt(x * x + y * y);
+	public float maxValue => MathF.Max(x, y);
+	public float minValue => MathF.Min(x, y);
 	
 	public Vector2 normalized
 	{

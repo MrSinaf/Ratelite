@@ -16,6 +16,8 @@ public struct Vector2Int(int x, int y) : IEquatable<Vector2Int>, ILerpable<Vecto
 	
 	public float length => MathF.Sqrt(x * x + y * y);
 	public int lengthSquared => x * x + y * y;
+	public int maxValue => (int)MathF.Max(x, y);
+	public int minValue => (int)MathF.Min(x, y);
 	
 	public Vector2 aspect
 	{
