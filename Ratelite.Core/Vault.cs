@@ -133,41 +133,56 @@ public static class Vault
 	
 	public static T LoadResource<T>(string path, IResourceConfig? config = null)
 			where T : class, IResource<T>
+		=> LoadExternResource<T>(Path.Combine("assets", path), config);
+	
+	public static T LoadExternResource<T>(string path, IResourceConfig? config = null)
+			where T : class, IResource<T>
 	{
-		var fullPath = Path.Combine("assets", path);
-		if (!File.Exists(fullPath))
+		if (!File.Exists(path))
 			throw new FileNotFoundException($"The resource '{path}' does not exist! (￣_￣|||)");
 		
-		var extension = Path.GetExtension(fullPath);
+		var extension = Path.GetExtension(path);
 		if (!T.ValidateExtension(extension))
 			throw new ArgumentException(
 				"Unsupported format ⊙﹏⊙∥:" + extension
 			);
 		
-		using var stream = File.OpenRead(fullPath);
+		using var stream = File.OpenRead(path);
 		var asset = T.Load(new VaultRessource(stream, extension, config));
 		return asset;
 	}
 	
 	public static async Task<T> LoadResourceAsync<T>(string path, IResourceConfig? config = null)
 			where T : class, IResourceAsync<T>
+		=> await LoadExternResourceAsync<T>(Path.Combine("assets", path), config);
+	
+	public static async Task<T> LoadExternResourceAsync<T>(
+		string path,
+		IResourceConfig? config = null
+	) where T : class, IResourceAsync<T>
 	{
-		var fullPath = Path.Combine("assets", path);
-		if (!File.Exists(fullPath))
+		if (!File.Exists(path))
 			throw new FileNotFoundException($"The resource '{path}' does not exist! (￣_￣|||)");
 		
-		var extension = Path.GetExtension(fullPath);
+		var extension = Path.GetExtension(path);
 		if (!T.ValidateExtension(extension))
 			throw new ArgumentException(
 				"Unsupported format ⊙﹏⊙∥:" + extension
 			);
 		
-		await using var stream = File.OpenRead(fullPath);
+		await using var stream = File.OpenRead(path);
 		var asset = await T.LoadAsync(new VaultRessource(stream, extension, config));
 		return asset;
 	}
 	
 	public static T? LoadResource<T>(
+		string path,
+		string name,
+		IResourceConfig? config = null
+	) where T : class, IResource<T>
+		=> LoadExternResource<T>(Path.Combine("assets", path), name, config);
+	
+	public static T? LoadExternResource<T>(
 		string path,
 		string name,
 		IResourceConfig? config = null
@@ -186,24 +201,31 @@ public static class Vault
 			return null;
 		}
 		
-		var fullPath = Path.Combine("assets", path);
-		if (!File.Exists(fullPath))
+		if (!File.Exists(path))
 			throw new FileNotFoundException($"The resource '{path}' does not exist! (￣_￣|||)");
 		
-		var extension = Path.GetExtension(fullPath);
+		var extension = Path.GetExtension(path);
 		if (!T.ValidateExtension(extension))
 			throw new ArgumentException(
 				"Unsupported format ⊙﹏⊙∥:" + extension
 			);
 		
-		using var stream = File.OpenRead(fullPath);
+		using var stream = File.OpenRead(path);
 		var asset = T.Load(new VaultRessource(stream, extension, config));
 		AddAsset(name, asset, path, config);
 		
 		return asset;
 	}
 	
+	
 	public static async Task<T?> LoadResourceAsync<T>(
+		string path,
+		string name,
+		IResourceConfig? config = null
+	) where T : class, IResourceAsync<T>
+		=> await LoadExternResourceAsync<T>(Path.Combine("assets", path), name, config);
+	
+	public static async Task<T?> LoadExternResourceAsync<T>(
 		string path,
 		string name,
 		IResourceConfig? config = null
@@ -222,17 +244,16 @@ public static class Vault
 			return null;
 		}
 		
-		var fullPath = Path.Combine("assets", path);
-		if (!File.Exists(fullPath))
+		if (!File.Exists(path))
 			throw new FileNotFoundException($"The resource '{path}' does not exist! (￣_￣|||)");
 		
-		var extension = Path.GetExtension(fullPath);
+		var extension = Path.GetExtension(path);
 		if (!T.ValidateExtension(extension))
 			throw new ArgumentException(
 				"Unsupported format ⊙﹏⊙∥:" + extension
 			);
 		
-		await using var stream = File.OpenRead(fullPath);
+		await using var stream = File.OpenRead(path);
 		var asset = await T.LoadAsync(new VaultRessource(stream, extension, config));
 		AddAsset(name, asset, path, config);
 		
