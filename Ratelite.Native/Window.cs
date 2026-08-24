@@ -227,6 +227,9 @@ public sealed unsafe class Window
 		}
 	}
 	
+	public void Maximize()
+		=> glfwMaximizeWindow(handle);
+	
 	public void Center()
 	{
 		var monitor = glfwGetPrimaryMonitor();

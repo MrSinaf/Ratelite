@@ -18,6 +18,18 @@ public class RConfig
 		return this;
 	}
 	
+	public RConfig AddModules(params Type[] moduleTypes)
+	{
+		foreach (var module in moduleTypes)
+		{
+			if (typeof(IModule).IsAssignableFrom(module))
+				modules.Add((IModule)Activator.CreateInstance(module)!);
+			else Log.Warning("Module type is not IModule: " + module);
+		}
+		
+		return this;
+	}
+	
 	public RConfig SetIcon(string path)
 	{
 		if (!File.Exists(path))
