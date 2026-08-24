@@ -53,6 +53,7 @@ public class Layout : UIElement
 	{
 		base.AddChild(element);
 		element.elementChanged += OnElementChanged;
+		element.elementActive += OnElementActive;
 		isLocalDirty = true;
 	}
 	
@@ -60,6 +61,7 @@ public class Layout : UIElement
 	{
 		base.RemoveChild(element);
 		element.elementChanged -= OnElementChanged;
+		element.elementActive -= OnElementActive;
 		isLocalDirty = true;
 	}
 	
@@ -70,8 +72,9 @@ public class Layout : UIElement
 	}
 	
 	private void OnElementChanged(UIElement element) => isDirty = true;
+	private void OnElementActive(UIElement element) => isLocalDirty = true;
 	
-	private void ReArrangeChildren()
+	public void ReArrangeChildren()
 	{
 		size = Vector2.zero;
 		var array = childrenArray;

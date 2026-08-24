@@ -45,6 +45,7 @@ public class UIElement
 	public virtual Region uv { get; set; } = new (Vector2.zero, Vector2.one);
 	
 	public event Action<UIElement> elementChanged = delegate { };
+	public event Action<UIElement> elementActive = delegate { };
 	
 	public virtual bool active
 	{
@@ -54,6 +55,7 @@ public class UIElement
 			field = value;
 			if (field)
 				isDirty = true;
+			elementActive(this);
 		}
 	} = true;
 	public virtual Vector2 position
