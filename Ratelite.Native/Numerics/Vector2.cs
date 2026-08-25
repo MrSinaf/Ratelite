@@ -10,6 +10,7 @@ public struct Vector2(float x, float y) : IEquatable<Vector2>, ILerpable<Vector2
 	public static Vector2 right => new (1, 0);
 	public static Vector2 top => new (0, 1);
 	public static Vector2 bottom => new (0, -1);
+	public static Vector2 center => new (0.5F);
 	public static Vector2 max => new (float.MaxValue);
 	public static Vector2 min => new (float.MinValue);
 	
