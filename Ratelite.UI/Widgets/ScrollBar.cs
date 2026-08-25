@@ -52,7 +52,8 @@ public class ScrollBar : UIElement
 	
 	public Action<float> onCursorChanged;
 	
-	private bool isLocalDirty;
+	public bool isLocalDirty;
+	public bool doCalcul;
 	
 	public ScrollBar(Action<float> onCursorChanged, Orientation orientation, string? prefab = "")
 	{
@@ -77,9 +78,6 @@ public class ScrollBar : UIElement
 	
 	private void CursorPositionUpdated()
 	{
-		if (availableLenght > contentLenght)
-			return;
-		
 		float result;
 		if (orientation == Orientation.Horizontal)
 		{
@@ -93,6 +91,7 @@ public class ScrollBar : UIElement
 		}
 		onCursorChanged(result);
 		ContentLenghtUpdated();
+		isLocalDirty = false;
 	}
 	
 	private void ContentLenghtUpdated()

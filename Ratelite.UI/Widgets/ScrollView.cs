@@ -9,6 +9,7 @@ public class ScrollView : UIElement
 	private readonly UIElement content;
 	
 	public float scrollSpeed = 10;
+	private bool isLocalDirty;
 	
 	public ScrollView(
 		UIElement content,
@@ -42,6 +43,18 @@ public class ScrollView : UIElement
 		UIPrefab.Apply(prefab, this);
 	}
 	
+	protected override void EndUpdate()
+	{
+		if (isLocalDirty)
+		{
+			horizontalScroll.availableLenght = mask.realSize.x;
+			horizontalScroll.contentLenght = content.realSize.x;
+			verticalScroll.availableLenght = mask.realSize.y;
+			verticalScroll.contentLenght = content.realSize.y;
+			isLocalDirty = false;
+		}
+	}
+	
 	private void OnScroll(Vector2Int delta)
 	{
 		if (isCursorOver)
@@ -55,21 +68,8 @@ public class ScrollView : UIElement
 			verticalScroll.cursorPosition += delta.y * scrollSpeed;
 	}
 	
-	private void OnChanged(UIElement _)
-	{
-		horizontalScroll.availableLenght = mask.realSize.x;
-		horizontalScroll.contentLenght = content.realSize.x;
-		verticalScroll.availableLenght = mask.realSize.y;
-		verticalScroll.contentLenght = content.realSize.y; 
-	}
-	
-	private void ContentChanged(UIElement _)
-	{
-		horizontalScroll.availableLenght = mask.realSize.x;
-		horizontalScroll.contentLenght = content.realSize.x;
-		verticalScroll.availableLenght = mask.realSize.y; 
-		verticalScroll.contentLenght = content.realSize.y; 
-	}
+	private void OnChanged(UIElement _) => isLocalDirty = true;
+	private void ContentChanged(UIElement _) => isLocalDirty = true;
 	
 	private void OnHorizontalScroll(float delta)
 	{

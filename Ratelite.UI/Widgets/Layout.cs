@@ -65,7 +65,7 @@ public class Layout : UIElement
 		isLocalDirty = true;
 	}
 	
-	protected override void BeginUpdate()
+	protected override void EndUpdate()
 	{
 		if (isLocalDirty)
 			ReArrangeChildren();
