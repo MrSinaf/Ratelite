@@ -23,7 +23,7 @@ public class Texture2D : Texture, IHotReloadResourceAsync, IResourceAsync<Textur
 		get => pixels[x + y * size.x];
 	}
 	
-	public Texture2D(int width, int height, Color[] pixels, Config? config)
+	public Texture2D(int width, int height, Color[] pixels, Config? config = null)
 	{
 		config ??= defaultConfig;
 		size = new Vector2Int(width, height);
@@ -58,7 +58,7 @@ public class Texture2D : Texture, IHotReloadResourceAsync, IResourceAsync<Textur
 		return new Texture2D(
 			image.width,
 			image.height,
-			Color.AsColors(image.data).ToArray(),
+			[.. Color.AsColors(image.data)],
 			ress.config as Config
 		);
 	}
