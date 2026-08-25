@@ -3,9 +3,10 @@ using Ratelite.Utils;
 
 namespace Ratelite.Resources;
 
+// Se renseigner sur 'Bindless textures' (Texture à taille fixe en array)
 public class Shader : IResourceAsync<Shader>
 {
-	private const string OPENGL_VERSION = "#version 330 core";
+	private const string OPENGL_VERSION = "#version 440 core";
 	
 	public readonly IReadOnlyDictionary<string, object> defaultUniforms;
 	public readonly GProgram gProgram;
