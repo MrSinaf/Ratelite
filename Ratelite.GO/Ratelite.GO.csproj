@@ -13,7 +13,7 @@
         <Authors>PurrVert</Authors>
         <Title>Ratelite.GO</Title>
 
-        <AssemblyVersion>0.4.0</AssemblyVersion>
+        <AssemblyVersion>0.1.0</AssemblyVersion>
         <Version>$(AssemblyVersion)-preview</Version>
         
         <IncludeProjectReferencesDuringPack>true</IncludeProjectReferencesDuringPack>
