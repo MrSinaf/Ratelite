@@ -7,18 +7,19 @@ public class ScrollBar : UIElement
 	public readonly UIElement cursor;
 	public readonly Orientation orientation;
 	
-	private float _cursorPosition;
 	private Vector2 lastCursorPosition;
 	
 	public bool avalaibleIsGreatestContent { get; private set; }
+	public float cursorResult { get; private set; }
 	
+	private float _cursorPosition;
 	public float cursorPosition
 	{
 		get => _cursorPosition;
 		set
 		{
 			_cursorPosition = value;
-			isLocalDirty = true;
+			isCursorPositionDirty = true;
 		}
 	}
 	
@@ -27,12 +28,8 @@ public class ScrollBar : UIElement
 		get;
 		set
 		{
-			if (field == value)
-				return;
-			
 			field = value;
 			avalaibleIsGreatestContent = availableLenght > contentLenght;
-			ContentLenghtUpdated();
 		}
 	}
 	
@@ -41,19 +38,13 @@ public class ScrollBar : UIElement
 		get;
 		set
 		{
-			if (field == value)
-				return;
-			
 			field = value;
 			avalaibleIsGreatestContent = availableLenght > contentLenght;
-			ContentLenghtUpdated();
 		}
 	}
 	
 	public Action<float> onCursorChanged;
-	
-	public bool isLocalDirty;
-	public bool doCalcul;
+	private bool isCursorPositionDirty;
 	
 	public ScrollBar(Action<float> onCursorChanged, Orientation orientation, string? prefab = "")
 	{
@@ -72,26 +63,26 @@ public class ScrollBar : UIElement
 		// Pour le moment, nécessaire de le faire ici, pour que les enfants soient calculé (dans
 		// le cas d'un Layout). Et il est nécessaire de le faire tardivement, car on peut vouloir
 		// afficher la liste depuis le haut (voir ScrollView).
-		if (isLocalDirty)
-			CursorPositionUpdated();
+		if (isCursorPositionDirty)
+			CursorPositionUpdated(true);
 	}
 	
-	private void CursorPositionUpdated()
+	public void CursorPositionUpdated(bool sendEvent)
 	{
-		float result;
 		if (orientation == Orientation.Horizontal)
 		{
 			_cursorPosition = Math.Clamp(cursorPosition, 0, realSize.x - cursor.realSize.x);
-			result = cursorPosition / realSize.x * contentLenght;
+			cursorResult = cursorPosition / realSize.x * contentLenght;
 		}
 		else
 		{
 			_cursorPosition = Math.Clamp(cursorPosition, 0, realSize.y - cursor.realSize.y);
-			result = cursorPosition / realSize.y * contentLenght;
+			cursorResult = cursorPosition / realSize.y * contentLenght;
 		}
-		onCursorChanged(result);
+		if (sendEvent)
+			onCursorChanged(cursorResult);
 		ContentLenghtUpdated();
-		isLocalDirty = false;
+		isCursorPositionDirty = false;
 	}
 	
 	private void ContentLenghtUpdated()

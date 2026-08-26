@@ -2,8 +2,8 @@
 
 public class ScrollView : UIElement
 {
-	public readonly ScrollBar horizontalScroll;
-	public readonly ScrollBar verticalScroll;
+	public readonly ScrollBar hScroll;
+	public readonly ScrollBar vScroll;
 	private readonly Mask mask;
 	
 	private readonly UIElement content;
@@ -23,14 +23,14 @@ public class ScrollView : UIElement
 		
 		base.AddChild(mask = new Mask());
 		base.AddChild(
-			horizontalScroll = new ScrollBar(OnHorizontalScroll, Orientation.Horizontal)
+			hScroll = new ScrollBar(OnHorizontalScroll, Orientation.Horizontal)
 			{
 				active = withHorizontal,
 				cursorPosition = startOnTop ? float.MaxValue : 0
 			}
 		);
 		base.AddChild(
-			verticalScroll = new ScrollBar(OnVerticalScroll, Orientation.Vertical)
+			vScroll = new ScrollBar(OnVerticalScroll, Orientation.Vertical)
 			{
 				active = withVertical,
 				cursorPosition = startOnTop ? float.MaxValue : 0
@@ -47,11 +47,24 @@ public class ScrollView : UIElement
 	{
 		if (isLocalDirty)
 		{
-			horizontalScroll.availableLenght = mask.realSize.x;
-			horizontalScroll.contentLenght = content.realSize.x;
-			verticalScroll.availableLenght = mask.realSize.y;
-			verticalScroll.contentLenght = content.realSize.y;
+			if (hScroll.active)
+			{
+				hScroll.availableLenght = mask.realSize.x;
+				hScroll.contentLenght = content.realSize.x;
+				hScroll.CursorPositionUpdated(false);
+			}
+			
+			if (vScroll.active)
+			{
+				vScroll.availableLenght = mask.realSize.y;
+				vScroll.contentLenght = content.realSize.y;
+				vScroll.CursorPositionUpdated(false);
+			}
 			isLocalDirty = false;
+			
+			var result = new Vector2(-hScroll.cursorResult, -vScroll.cursorResult);
+			if (content.position != result)
+				content.position = result;
 		}
 	}
 	
@@ -59,13 +72,13 @@ public class ScrollView : UIElement
 	{
 		if (isCursorOver)
 		{
-			verticalScroll.cursorPosition += delta.y * scrollSpeed;
-			horizontalScroll.cursorPosition += delta.x * scrollSpeed;
+			vScroll.cursorPosition += delta.y * scrollSpeed;
+			hScroll.cursorPosition += delta.x * scrollSpeed;
 		}
-		else if (horizontalScroll.isCursorOver)
-			horizontalScroll.cursorPosition += delta.x * scrollSpeed;
-		else if (verticalScroll.isCursorOver)
-			verticalScroll.cursorPosition += delta.y * scrollSpeed;
+		else if (hScroll.isCursorOver)
+			hScroll.cursorPosition += delta.x * scrollSpeed;
+		else if (vScroll.isCursorOver)
+			vScroll.cursorPosition += delta.y * scrollSpeed;
 	}
 	
 	private void OnChanged(UIElement _) => isLocalDirty = true;
@@ -92,22 +105,22 @@ public class ScrollView : UIElement
 		const float size = 10;
 		e.size = new Vector2(300, 300);
 		
-		var withV = e.verticalScroll.active;
-		var withH = e.horizontalScroll.active;
+		var withV = e.vScroll.active;
+		var withH = e.hScroll.active;
 		
 		e.mask.margin = new Region(0, withH ? size : 0, withV ? size : 0, 0);
 		e.mask.anchorMin = Vector2.zero;
 		e.mask.anchorMax = Vector2.one;
 		
-		e.verticalScroll.size = e.horizontalScroll.size = new Vector2(size);
+		e.vScroll.size = e.hScroll.size = new Vector2(size);
 		
-		e.horizontalScroll.anchorMin = new Vector2(0, 0);
-		e.horizontalScroll.anchorMax = new Vector2(1, 0);
-		e.horizontalScroll.margin = new Region(0, 0,  withV ? size : 0, 0);
+		e.hScroll.anchorMin = new Vector2(0, 0);
+		e.hScroll.anchorMax = new Vector2(1, 0);
+		e.hScroll.margin = new Region(0, 0,  withV ? size : 0, 0);
 		
-		e.verticalScroll.pivot = new Vector2(1, 0);
-		e.verticalScroll.anchorMin = new Vector2(1, 0);
-		e.verticalScroll.anchorMax = new Vector2(1, 1);
-		e.verticalScroll.margin = new Region(0, withH ? size : 0, 0, 0);
+		e.vScroll.pivot = new Vector2(1, 0);
+		e.vScroll.anchorMin = new Vector2(1, 0);
+		e.vScroll.anchorMax = new Vector2(1, 1);
+		e.vScroll.margin = new Region(0, withH ? size : 0, 0, 0);
 	}
 }
