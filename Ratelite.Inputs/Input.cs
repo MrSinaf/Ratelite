@@ -1,4 +1,6 @@
-﻿namespace Ratelite.Inputs;
+﻿using System.Numerics;
+
+namespace Ratelite.Inputs;
 
 public static class Input
 {
@@ -11,6 +13,8 @@ public static class Input
 	public static event Action<MouseButton> mouseButtonPressed = delegate {};
 	public static event Action<MouseButton> mouseButtonHolded = delegate {};
 	public static event Action<MouseButton> mouseButtonReleased = delegate {};
+	
+	public static Vector2 cursorPosition => R.game.window.cursorPosition;
 	
 	internal static void Init()
 	{

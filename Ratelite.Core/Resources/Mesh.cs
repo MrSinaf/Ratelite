@@ -30,7 +30,7 @@ public abstract class Mesh : IAsset, IDisposable
 	}
 	
 	public abstract void ApplyVertex();
-	public abstract void ApplyVertex(int offset, int length);
+	public abstract void ApplyVertex(int offset, int length, bool updateBounds = true);
 	public abstract void ApplyIndices();
 	public abstract void ApplyIndices(int offset, int length);
 	protected abstract void CreateBuffer();
@@ -71,7 +71,7 @@ public class Mesh<T> : Mesh where T : unmanaged, IVertex
 	
 	public override void ApplyVertex() => ApplyVertex(0, vertices.Length);
 	
-	public override void ApplyVertex(int offset, int length)
+	public override void ApplyVertex(int offset, int length, bool updateBounds = true)
 	{
 		unsafe
 		{
@@ -84,7 +84,9 @@ public class Mesh<T> : Mesh where T : unmanaged, IVertex
 				);
 			}
 		}
-		UpdateBounds();
+		
+		if (updateBounds)
+			UpdateBounds();
 	}
 	
 	public override void ApplyIndices() => ApplyIndices(0, indices.Length);
