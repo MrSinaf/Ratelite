@@ -10,12 +10,13 @@ public class RObject
 	public bool enable = true;
 	public bool isDestroyed { get; private set; }
 	public bool isActif => enable && !isDestroyed;
-	public bool canDraw => material != null && mesh is { isValid: true };
+	public bool canDraw => mesh is { isValid: true };
 	public float drawDepth = 1F;
 	
 	public string name;
 	public Mesh? mesh;
 	public Material? material;
+	public Material[]? materials;
 	
 	private bool dirtyMatrix;
 	
@@ -52,8 +53,8 @@ public class RObject
 		{
 			if (dirtyMatrix)
 			{
-				field = Matrix3X3.CreateRotation(float.DegreesToRadians(rotation)) * 
-						Matrix3X3.CreateScale(scale) * 
+				field = Matrix3X3.CreateRotation(float.DegreesToRadians(rotation)) *
+						Matrix3X3.CreateScale(scale) *
 						Matrix3X3.CreateTranslation(position);
 				dirtyMatrix = false;
 			}
@@ -74,10 +75,24 @@ public class RObject
 			return;
 		
 		components.Render();
-		material!.ApplyProperties();
-		material!.shader.gProgram.SetUniform("u_model", matrix);
-		material!.shader.gProgram.SetUniform("u_objectDepth", drawDepth);
-		mesh!.Draw();
+		if (mesh!.subMeshes.Count > 0 && materials != null)
+		{
+			foreach (var subMesh in mesh!.subMeshes)
+			{
+				var mat = materials![subMesh.materialIndex];
+				mat.ApplyProperties();
+				mat.shader.gProgram.SetUniform("u_model", matrix);
+				mat.shader.gProgram.SetUniform("u_objectDepth", drawDepth);
+				mesh!.DrawSubMeshes(subMesh);
+			}
+		}
+		else
+		{
+			material!.ApplyProperties();
+			material!.shader.gProgram.SetUniform("u_model", matrix);
+			material!.shader.gProgram.SetUniform("u_objectDepth", drawDepth);
+			mesh!.Draw();
+		}
 	}
 	
 	internal void InternalUpdate()
