@@ -29,10 +29,10 @@ public static class Vault
 		if (assets.TryGetValue(name, out var assetRef) &&
 			assetRef is { initialPath: not null, asset: IHotReloadResource asset })
 		{
-			var fullPath = Path.Combine(projectRoot, "assets", assetRef.initialPath);
+			var fullPath = Path.Combine(projectRoot, assetRef.initialPath);
 			if (!File.Exists(fullPath))
 				throw new FileNotFoundException(
-					$"The resource '{assetRef.initialPath}' does not exist! (￣_￣|||)"
+					$"The resource '{fullPath}' does not exist! (￣_￣|||)"
 				);
 			
 			using var stream = File.OpenRead(fullPath);
@@ -53,10 +53,10 @@ public static class Vault
 		if (assets.TryGetValue(name, out var assetRef) &&
 			assetRef is { initialPath: not null, asset: IHotReloadResourceAsync asset })
 		{
-			var fullPath = Path.Combine(projectRoot, "assets", assetRef.initialPath);
+			var fullPath = Path.Combine(projectRoot, assetRef.initialPath);
 			if (!File.Exists(fullPath))
 				throw new FileNotFoundException(
-					$"The resource '{assetRef.initialPath}' does not exist! (￣_￣|||)"
+					$"The resource '{fullPath}' does not exist! (￣_￣|||)"
 				);
 			
 			await using var stream = File.OpenRead(fullPath);
