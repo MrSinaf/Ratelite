@@ -10,6 +10,7 @@ public abstract class Mesh : IAsset, IDisposable
 	public GVertexArrayObject vao { get; protected set; } = null!;
 	public Region bounds { get; protected set; }
 	public bool isValid => !isDisposed;
+	public List<SubMesh> subMeshes { get; protected set; } = [];
 	
 	public abstract int nVertices { get; }
 	
@@ -36,6 +37,12 @@ public abstract class Mesh : IAsset, IDisposable
 	protected abstract void CreateBuffer();
 	protected abstract void UpdateBounds();
 	
+	public Mesh AddSubMesh(SubMesh subMesh)
+	{
+		subMeshes.Add(subMesh);
+		return this;
+	}
+	
 	public void Draw()
 	{
 		ObjectDisposedException.ThrowIf(!isValid, nameof(Mesh));
@@ -46,6 +53,19 @@ public abstract class Mesh : IAsset, IDisposable
 			(uint)indices.Length,
 			DrawElementsType.UnsignedInt,
 			0
+		);
+	}
+	
+	public void DrawSubMeshes(SubMesh subMesh)
+	{
+		ObjectDisposedException.ThrowIf(!isValid, nameof(Mesh));
+
+		vao.Bind();
+		GL.DrawElements(
+			PrimitiveType.Triangles,
+			subMesh.indexCount,
+			DrawElementsType.UnsignedInt,
+			subMesh.indexOffsetInOctets
 		);
 	}
 	
@@ -167,6 +187,25 @@ public class Mesh<T> : Mesh where T : unmanaged, IVertex
 		vertexBuffer.Bind();
 		vao = T.GetVAO();
 		indexBuffer.Bind();
+	}
+}
+
+public record struct SubMesh
+{
+	public readonly uint indexOffset;
+	public readonly uint indexCount;
+	public readonly uint materialIndex;
+	public readonly nint indexOffsetInOctets;
+	
+	public SubMesh(uint indexOffset, uint indexCount, uint materialIndex)
+	{
+		this.indexOffset = indexOffset;
+		this.indexCount = indexCount;
+		this.materialIndex = materialIndex;
+		unsafe
+		{
+			indexOffsetInOctets = (nint)(indexOffset * sizeof(uint));
+		}
 	}
 }
 
