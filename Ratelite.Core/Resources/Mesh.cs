@@ -5,7 +5,7 @@ namespace Ratelite.Resources;
 
 public abstract class Mesh : IAsset, IDisposable
 {
-	public required uint[] indices;
+	public required int[] indices;
 	
 	public GVertexArrayObject vao { get; protected set; } = null!;
 	public Region bounds { get; protected set; }
@@ -18,7 +18,7 @@ public abstract class Mesh : IAsset, IDisposable
 	protected GBuffer<uint> indexBuffer = null!;
 	private bool isDisposed;
 	
-	public static Mesh Create<T>(T[] vertices, uint[] indices) where T : unmanaged, IVertex
+	public static Mesh Create<T>(T[] vertices, int[] indices) where T : unmanaged, IVertex
 	{
 		var mesh = new Mesh<T>
 		{
@@ -115,9 +115,9 @@ public class Mesh<T> : Mesh where T : unmanaged, IVertex
 	{
 		unsafe
 		{
-			fixed (uint* ptr = indices.AsSpan(offset, length))
+			fixed (int* ptr = indices.AsSpan(offset, length))
 			{
-				indexBuffer.Set((uint)offset, ptr, (uint)(length * sizeof(uint)));
+				indexBuffer.Set((uint)(offset * sizeof(uint)), ptr, (uint)(length * sizeof(uint)));
 			}
 		}
 	}
@@ -134,7 +134,7 @@ public class Mesh<T> : Mesh where T : unmanaged, IVertex
 			);
 		}
 		vao = T.GetVAO();
-		fixed (uint* ptr = indices.AsSpan())
+		fixed (int* ptr = indices.AsSpan())
 		{
 			indexBuffer = new GBuffer<uint>(
 				BufferType.ElementsBuffer,
@@ -190,23 +190,12 @@ public class Mesh<T> : Mesh where T : unmanaged, IVertex
 	}
 }
 
-public record struct SubMesh
+public record struct SubMesh(uint indexOffset, uint indexCount, uint materialIndex)
 {
-	public readonly uint indexOffset;
-	public readonly uint indexCount;
-	public readonly uint materialIndex;
-	public readonly nint indexOffsetInOctets;
-	
-	public SubMesh(uint indexOffset, uint indexCount, uint materialIndex)
-	{
-		this.indexOffset = indexOffset;
-		this.indexCount = indexCount;
-		this.materialIndex = materialIndex;
-		unsafe
-		{
-			indexOffsetInOctets = (nint)(indexOffset * sizeof(uint));
-		}
-	}
+	public readonly uint indexOffset = indexOffset;
+	public readonly uint indexCount = indexCount;
+	public readonly uint materialIndex = materialIndex;
+	public readonly nint indexOffsetInOctets = (nint)(indexOffset * sizeof(uint));
 }
 
 public struct VertexPositionUV : IVertex

@@ -40,33 +40,32 @@ public static class MeshFactory
 	public static Mesh CreateQuads(ReadOnlySpan<(Rect vertices, Region uvs)> quads)
 	{
 		var vertices = new VertexPositionUV[quads.Length * 4];
-		var indices = new uint[quads.Length * 6];
+		var indices = new int[quads.Length * 6];
 		
 		for (var i = 0; i < quads.Length; i++)
 		{
 			var quad = quads[i];
 			var pos00 = quad.vertices.position;
 			var pos11 = quad.vertices.position + quad.vertices.size;
-			var iV = i * 4;
+			var vI = i * 4;
 			
-			vertices[iV].position = new Vector2(pos00.x, pos11.y);
-			vertices[iV + 1].position = pos11;
-			vertices[iV + 2].position = new Vector2(pos11.x, pos00.y);
-			vertices[iV + 3].position = pos00;
+			vertices[vI].position = new Vector2(pos00.x, pos11.y);
+			vertices[vI + 1].position = pos11;
+			vertices[vI + 2].position = new Vector2(pos11.x, pos00.y);
+			vertices[vI + 3].position = pos00;
 			
-			vertices[iV].uv = quad.uvs.position00;
-			vertices[iV + 1].uv = new Vector2(quad.uvs.position11.x, quad.uvs.position00.y);
-			vertices[iV + 2].uv = quad.uvs.position11;
-			vertices[iV + 3].uv = new Vector2(quad.uvs.position00.x, quad.uvs.position11.y);
+			vertices[vI].uv = quad.uvs.position00;
+			vertices[vI + 1].uv = new Vector2(quad.uvs.position11.x, quad.uvs.position00.y);
+			vertices[vI + 2].uv = quad.uvs.position11;
+			vertices[vI + 3].uv = new Vector2(quad.uvs.position00.x, quad.uvs.position11.y);
 			
-			var jV = (uint)iV;
 			var iI = i * 6;
-			indices[iI] = jV;
-			indices[iI + 1] = jV + 3;
-			indices[iI + 2] = jV + 1;
-			indices[iI + 3] = jV + 3;
-			indices[iI + 4] = jV + 2;
-			indices[iI + 5] = jV + 1;
+			indices[iI] = vI;
+			indices[iI + 1] = vI + 3;
+			indices[iI + 2] = vI + 1;
+			indices[iI + 3] = vI + 3;
+			indices[iI + 4] = vI + 2;
+			indices[iI + 5] = vI + 1;
 		}
 		
 		return Mesh.Create(vertices, indices);
