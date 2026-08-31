@@ -5,9 +5,6 @@ namespace Ratelite.GO;
 
 public class Camera
 {
-	private static readonly Comparison<RObject> drawOrderComparison =
-			(a, b) => a.drawOrder.CompareTo(b.drawOrder);
-	
 	private readonly CameraUniform uniform = new ();
 	private readonly Mesh mesh;
 	
@@ -63,8 +60,6 @@ public class Camera
 		uniform.deltaTime = Time.delta;
 		uniform.time = Time.total;
 		uniform.UpdateBuffer();
-		
-		objects.Sort(drawOrderComparison);
 		
 		renderTexture.Bind();
 		{
