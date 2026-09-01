@@ -115,6 +115,7 @@ public class Mesh<T> : Mesh where T : unmanaged, IVertex
 	{
 		unsafe
 		{
+			vao.Bind();
 			fixed (int* ptr = indices.AsSpan(offset, length))
 			{
 				indexBuffer.Set((uint)(offset * sizeof(uint)), ptr, (uint)(length * sizeof(uint)));
