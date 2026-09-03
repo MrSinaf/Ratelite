@@ -443,7 +443,7 @@ public static unsafe class GL
 		=> glClear(mask);
 	
 	public static void Viewport(int x, int y, uint width, uint height)
-		=> glViewport(x, y, width, height);
+		=> glViewport(x, y, width + (width % 2 == 0 ? 0u : 1), height + (height % 2 == 0 ? 0u : 1));
 	
 	public static void Enable(EnableCap cap)
 		=> glEnable(cap);

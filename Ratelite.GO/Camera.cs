@@ -8,16 +8,32 @@ public class Camera
 	private readonly CameraUniform uniform = new ();
 	private readonly Mesh mesh;
 	
-	public World? world { get; internal set; }
-	public Vector2 resolution { get; private set; }
-	public Vector2 halfResolution { get; private set; }
-	public RenderTexture renderTexture { get; private set; } = null!;
-	
 	public bool actif = true;
 	public bool visible = true;
 	public Material material;
 	public Vector2 position;
 	
+	public event Action<float> onZoomChanged = delegate {};
+	
+	public World? world { get; internal set; }
+	public Vector2 halfResolution { get; private set; }
+	public RenderTexture renderTexture { get; private set; } = null!;
+	public float displayScale { get; private set; }
+	public float zoomScaled { get; private set; }
+	
+	private Vector2 displaySize;
+	private Vector2 displayPosition;
+	private Vector2 resolutionCalculated;
+	
+	public Vector2 resolution
+	{
+		get;
+		set
+		{
+			field = value;
+			UpdateRenderTexture();
+		}
+	} = new (960, 540);
 	public Color backgroundColor
 	{
 		get => renderTexture.clearColor;
@@ -49,14 +65,18 @@ public class Camera
 		
 		mesh = MeshFactory.CreateQuad(Vector2.one);
 		material = new Material(Vault.GetAsset<Shader>(GOModule.CAMERA_SHADER)!);
-		UpdateZoom();
+		
 		UpdateRenderTexture();
 	}
 	
 	internal void Render(List<RObject> objects)
 	{
-		uniform.projection = Matrix3X3.CreateTranslation(-position) *
-							 Matrix3X3.CreateOrthographic(resolution.x, resolution.y);
+		var snappedPosition = (position * zoom).ToVector2Int() / zoom;
+		uniform.projection = Matrix3X3.CreateTranslation(-snappedPosition) *
+							 Matrix3X3.CreateOrthographic(
+								 resolutionCalculated.x,
+								 resolutionCalculated.y
+							 );
 		uniform.deltaTime = Time.delta;
 		uniform.time = Time.total;
 		uniform.UpdateBuffer();
@@ -76,45 +96,63 @@ public class Camera
 	}
 	
 	public Vector2 ScreenToWorldPosition(Vector2 screenPosition)
-		=> position + screenPosition / zoom - halfResolution;
+		=> position + ((screenPosition - displayPosition) 
+			/ displaySize * resolution - halfResolution) / zoom;
 	
 	public Vector2 WorldToScreenPosition(Vector2 worldPosition)
-		=> (worldPosition - position) * zoom + halfResolution * zoom;
+		=> ((worldPosition - position) * zoom + halfResolution)
+				/ resolution * displaySize + displayPosition;
 	
 	private void UpdateZoom()
 	{
-		resolution = R.game.window.size / zoom;
+		resolutionCalculated = resolution / zoom;
 		halfResolution = resolution * 0.5F;
-		material.SetProperty("u_model", Matrix3X3.CreateScale(resolution));
-		material.SetProperty(
-			"u_projection",
-			Matrix3X3.CreateTranslation(new Vector2(0, 0)) *
-			Matrix3X3.CreateOrthographic(resolution.x, resolution.y, false)
-		);
+		zoomScaled = displayScale * zoom;
+		onZoomChanged.Invoke(zoom);
 	}
 	
 	private void OnWindowResized(Vector2Int size)
 	{
-		if (size != Vector2.zero)
-		{
-			renderTexture.Dispose();
-			UpdateRenderTexture();
-			UpdateZoom();
-		}
+		if (size.x <= 0 || size.y <= 0)
+			return;
+		
+		UpdateScreenProjection();
 	}
 	
 	private void UpdateRenderTexture()
 	{
 		renderTexture = new RenderTexture(
-			(uint)R.game.window.size.x,
-			(uint)R.game.window.size.y
+			(uint)resolution.x,
+			(uint)resolution.y
 		);
+		
 		material.SetProperty("u_texture", renderTexture);
+		UpdateScreenProjection();
+	}
+	
+	private void UpdateScreenProjection()
+	{
+		var frameBufferSize = R.game.window.frameBufferSize.ToVector2();
+		
+		displayScale = float.Ceiling(MathF.Max(
+			frameBufferSize.x / resolution.x,
+			frameBufferSize.y / resolution.y
+		));
+		
+		displaySize = resolution * displayScale;
+		displayPosition = (frameBufferSize - displaySize) * 0.5F;
+		
 		material.SetProperty(
 			"u_projection",
-			Matrix3X3.CreateTranslation(new Vector2(0, 0)) *
-			Matrix3X3.CreateOrthographic(resolution.x, resolution.y, false)
+			Matrix3X3.CreateOrthographic(frameBufferSize.x, frameBufferSize.y, false)
 		);
+		
+		material.SetProperty(
+			"u_model",
+			Matrix3X3.CreateScale(displaySize) *
+			Matrix3X3.CreateTranslation(displayPosition)
+		);
+		UpdateZoom();
 	}
 	
 	internal void Destroy()
