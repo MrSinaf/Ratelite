@@ -1,6 +1,5 @@
 ﻿namespace Ratelite.UI;
 
-// TODO > Si le canvas est ajouté avant World, celui-ci n'affiche rien Oo
 public class Canvas : IPlugin
 {
 	private readonly CanvasUniform uniform = new ();
