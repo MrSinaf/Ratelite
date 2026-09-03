@@ -40,9 +40,12 @@ public static class R
 			game = new GameWindow(config, splash);
 			splash.Destroy();
 			MainThread.Enqueue(() =>
+				{
+					config.OnGameWindow(game);
 					Stage.Load(
 						(Scene)Activator.CreateInstance(config.startingScene ?? typeof(Scene))!
-					)
+					);
+				}
 			);
 			game.window.Run();
 		}

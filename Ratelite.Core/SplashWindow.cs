@@ -184,7 +184,7 @@ public class SplashWindow
 		progressAssets.ProgressChanged += (_, value) => progress = value;
 		try
 		{
-			await config.Action(progressAssets);
+			await config.OnLoading(progressAssets);
 		}
 		catch (Exception e)
 		{

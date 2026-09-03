@@ -8,7 +8,8 @@ public class RConfig
 	public required WindowOptions windowOptions;
 	public RawImage? icon;
 	public Type? startingScene;
-	public event Func<IProgress<float>, Task> action = delegate { return Task.CompletedTask; };
+	public event Func<IProgress<float>, Task> onLoading = delegate { return Task.CompletedTask; };
+	public event Action<GameWindow> onGameWindow = delegate { };
 	
 	internal readonly List<IModule> modules = [];
 	
@@ -60,11 +61,18 @@ public class RConfig
 	
 	public RConfig LoadingAssets(Func<IProgress<float>, Task> action)
 	{
-		this.action = action;
+		onLoading = action;
+		return this;
+	}
+	
+	public RConfig OnGameWindow(Action<GameWindow> action)
+	{
+		onGameWindow = action;
 		return this;
 	}
 	
 	public void Run() => R.RunGame(this);
 	
-	internal async Task Action(IProgress<float> progress) => await action(progress);
+	internal async Task OnLoading(IProgress<float> progress) => await onLoading(progress);
+	internal void OnGameWindow(GameWindow window) => onGameWindow(window);
 }
