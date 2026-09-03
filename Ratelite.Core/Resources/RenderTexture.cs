@@ -72,6 +72,12 @@ public class RenderTexture : Texture
 	{
 		MainThread.Assert();
 		GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+		GL.Viewport(
+			0,
+			0,
+			(uint)R.game.window.frameBufferSize.x,
+			(uint)R.game.window.frameBufferSize.y
+		);
 		GL.ClearColor(previousClearColor);
 	}
 	
