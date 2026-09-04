@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Ratelite;
 
 public struct RegionInt(Vector2Int position00, Vector2Int position11)
@@ -9,15 +11,15 @@ public struct RegionInt(Vector2Int position00, Vector2Int position11)
 	public Vector2Int position00 { get; set; } = position00;
 	public Vector2Int position11 { get; set; } = position11;
 	
-	public Vector2Int min => new (left, top);
-	public Vector2Int max => new (right, bottom);
-	public Vector2Int size => max - min;
+	[JsonIgnore] public Vector2Int min => new (left, top);
+	[JsonIgnore] public Vector2Int max => new (right, bottom);
+	[JsonIgnore] public Vector2Int size => max - min;
 	
-	public int left => Math.Min(position00.x, position11.x);
-	public int right => Math.Max(position00.x, position11.x);
-	public int top => Math.Min(position00.y, position11.y);
-	public int bottom => Math.Max(position00.y, position11.y);
-	public Vector2Int center => (position00 + position11) / 2;
+	[JsonIgnore] public int left => Math.Min(position00.x, position11.x);
+	[JsonIgnore] public int right => Math.Max(position00.x, position11.x);
+	[JsonIgnore] public int top => Math.Min(position00.y, position11.y);
+	[JsonIgnore] public int bottom => Math.Max(position00.y, position11.y);
+	[JsonIgnore] public Vector2Int center => (position00 + position11) / 2;
 	
 	public RegionInt(Vector2Int position) : this(position, position) { }
 	

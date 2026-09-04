@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Ratelite;
 
 public struct Rect(Vector2 position, Vector2 size) : ILerpable<Rect>, IEquatable<Rect>
@@ -11,16 +13,16 @@ public struct Rect(Vector2 position, Vector2 size) : ILerpable<Rect>, IEquatable
 	public Vector2 min => position;
 	public Vector2 max => position + size;
 	
-	public float x => position.x;
-	public float y => position.y;
-	public float width => size.x;
-	public float height => size.y;
+	[JsonIgnore] public float x => position.x;
+	[JsonIgnore] public float y => position.y;
+	[JsonIgnore] public float width => size.x;
+	[JsonIgnore] public float height => size.y;
 	
-	public float left => position.x;
-	public float right => position.x + size.x;
-	public float top => position.y;
-	public float bottom => position.y + size.y;
-	public Vector2 center => position + size * 0.5f;
+	[JsonIgnore] public float left => position.x;
+	[JsonIgnore] public float right => position.x + size.x;
+	[JsonIgnore] public float top => position.y;
+	[JsonIgnore] public float bottom => position.y + size.y;
+	[JsonIgnore] public Vector2 center => position + size * 0.5f;
 	
 	public Rect(float x, float y, float width, float height) : 
 			this(new Vector2(x, y), new Vector2(width, height)) { }

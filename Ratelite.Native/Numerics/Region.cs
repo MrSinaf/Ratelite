@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Ratelite;
 
 public struct Region(Vector2 position00, Vector2 position11) : ILerpable<Region>, IEquatable<Region>
@@ -8,14 +10,14 @@ public struct Region(Vector2 position00, Vector2 position11) : ILerpable<Region>
 	public Vector2 position00 { get; set; } = position00;
 	public Vector2 position11 { get; set; } = position11;
 	
-	public Vector2 position => position00;
-	public Vector2 size => new (Math.Abs(right - left), Math.Abs(bottom - top));
+	[JsonIgnore] public Vector2 position => position00;
+	[JsonIgnore] public Vector2 size => new (Math.Abs(right - left), Math.Abs(bottom - top));
 	
-	public float left => position00.x;
-	public float bottom => position00.y;
-	public float right => position11.x;
-	public float top => position11.y;
-	public Vector2 center => (position00 + position11) * 0.5f;
+	[JsonIgnore] public float left => position00.x;
+	[JsonIgnore] public float bottom => position00.y;
+	[JsonIgnore] public float right => position11.x;
+	[JsonIgnore] public float top => position11.y;
+	[JsonIgnore] public Vector2 center => (position00 + position11) * 0.5f;
 	
 	public Region(Vector2 position) : this(position, position) { }
 	

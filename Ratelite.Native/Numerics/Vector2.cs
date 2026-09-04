@@ -1,4 +1,6 @@
-﻿namespace Ratelite;
+﻿using System.Text.Json.Serialization;
+
+namespace Ratelite;
 
 public struct Vector2(float x, float y) : IEquatable<Vector2>, ILerpable<Vector2>
 {
@@ -17,12 +19,12 @@ public struct Vector2(float x, float y) : IEquatable<Vector2>, ILerpable<Vector2
 	public float x { get; set; } = x;
 	public float y { get; set; } = y;
 	
-	public float lengthSquared => x * x + y * y;
-	public float length => MathF.Sqrt(x * x + y * y);
-	public float maxValue => MathF.Max(x, y);
-	public float minValue => MathF.Min(x, y);
+	[JsonIgnore] public float lengthSquared => x * x + y * y;
+	[JsonIgnore] public float length => MathF.Sqrt(x * x + y * y);
+	[JsonIgnore] public float maxValue => MathF.Max(x, y);
+	[JsonIgnore] public float minValue => MathF.Min(x, y);
 	
-	public Vector2 normalized
+	[JsonIgnore] public Vector2 normalized
 	{
 		get
 		{
@@ -31,7 +33,7 @@ public struct Vector2(float x, float y) : IEquatable<Vector2>, ILerpable<Vector2
 		}
 	}
 	
-	public Vector2 aspect
+	[JsonIgnore] public Vector2 aspect
 	{
 		get
 		{

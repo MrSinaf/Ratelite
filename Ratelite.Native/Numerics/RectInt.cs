@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Ratelite;
 
 public struct RectInt(Vector2Int position, Vector2Int size)
@@ -9,19 +11,19 @@ public struct RectInt(Vector2Int position, Vector2Int size)
 	public Vector2Int position { get; set; } = position;
 	public Vector2Int size { get; set; } = size;
 	
-	public Vector2Int min => position;
-	public Vector2Int max => position + size;
+	[JsonIgnore] public Vector2Int min => position;
+	[JsonIgnore] public Vector2Int max => position + size;
 	
-	public int x => position.x;
-	public int y => position.y;
-	public int width => size.x;
-	public int height => size.y;
+	[JsonIgnore] public int x => position.x;
+	[JsonIgnore] public int y => position.y;
+	[JsonIgnore] public int width => size.x;
+	[JsonIgnore] public int height => size.y;
 	
-	public int left => position.x;
-	public int right => position.x + size.x;
-	public int top => position.y;
-	public int bottom => position.y + size.y;
-	public Vector2Int center => position + size / 2;
+	[JsonIgnore] public int left => position.x;
+	[JsonIgnore] public int right => position.x + size.x;
+	[JsonIgnore] public int top => position.y;
+	[JsonIgnore] public int bottom => position.y + size.y;
+	[JsonIgnore] public Vector2Int center => position + size / 2;
 	
 	public RectInt(int x, int y, int width, int height) :
 			this(new Vector2Int(x, y), new Vector2Int(width, height)) { }

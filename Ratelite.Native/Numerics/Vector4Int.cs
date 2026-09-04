@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Ratelite;
 
 public struct Vector4Int(int x, int y, int z, int w) : IEquatable<Vector4Int>, ILerpable<Vector4Int>
@@ -10,10 +12,10 @@ public struct Vector4Int(int x, int y, int z, int w) : IEquatable<Vector4Int>, I
 	public int z { get; set; } = z;
 	public int w { get; set; } = w;
 	
-	public float length => MathF.Sqrt(x * x + y * y + z * z + w * w);
-	public int lengthSquared => x * x + y * y + z * z + w * w;
-	public int maxValue => (int)MathF.Max(x, MathF.Max(y, MathF.Max(z, w)));
-	public int minValue => (int)MathF.Min(x, MathF.Min(y, MathF.Min(z, w)));
+	[JsonIgnore] public float length => MathF.Sqrt(x * x + y * y + z * z + w * w);
+	[JsonIgnore] public int lengthSquared => x * x + y * y + z * z + w * w;
+	[JsonIgnore] public int maxValue => (int)MathF.Max(x, MathF.Max(y, MathF.Max(z, w)));
+	[JsonIgnore] public int minValue => (int)MathF.Min(x, MathF.Min(y, MathF.Min(z, w)));
 	
 	public Vector4Int(int xyzw) : this(xyzw, xyzw, xyzw, xyzw) { }
 	public Vector4Int(Vector2Int xy, int z, int w) : this(xy.x, xy.y, z, w) { }

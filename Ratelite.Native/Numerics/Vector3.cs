@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Ratelite;
 
 public struct Vector3(float x, float y, float z) : IEquatable<Vector3>, ILerpable<Vector3>
@@ -19,12 +21,12 @@ public struct Vector3(float x, float y, float z) : IEquatable<Vector3>, ILerpabl
 	public float y { get; set; } = y;
 	public float z { get; set; } = z;
 	
-	public float lengthSquared => x * x + y * y + z * z;
-	public float length => MathF.Sqrt(lengthSquared);
-	public float maxValue => MathF.Max(x, MathF.Max(y, z));
-	public float minValue => MathF.Min(x, MathF.Min(y, z));
+	[JsonIgnore] public float lengthSquared => x * x + y * y + z * z;
+	[JsonIgnore] public float length => MathF.Sqrt(lengthSquared);
+	[JsonIgnore] public float maxValue => MathF.Max(x, MathF.Max(y, z));
+	[JsonIgnore] public float minValue => MathF.Min(x, MathF.Min(y, z));
 	
-	public Vector3 normalized
+	[JsonIgnore] public Vector3 normalized
 	{
 		get
 		{
