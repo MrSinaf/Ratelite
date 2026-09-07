@@ -13,7 +13,7 @@ public class Camera
 	public Material material;
 	public Vector2 position;
 	
-	public event Action<float> onZoomChanged = delegate {};
+	public event Action<float> onZoomChanged = delegate { };
 	
 	public World? world { get; internal set; }
 	public Vector2 halfResolution { get; private set; }
@@ -34,6 +34,15 @@ public class Camera
 			UpdateRenderTexture();
 		}
 	} = new (960, 540);
+	public bool resolutionAuto
+	{
+		get;
+		set
+		{
+			field = value;
+			resolution = R.game.window.frameBufferSize;
+		}
+	} = false;
 	public Color backgroundColor
 	{
 		get => renderTexture.clearColor;
@@ -96,7 +105,7 @@ public class Camera
 	}
 	
 	public Vector2 ScreenToWorldPosition(Vector2 screenPosition)
-		=> position + ((screenPosition - displayPosition) 
+		=> position + ((screenPosition - displayPosition)
 			/ displaySize * resolution - halfResolution) / zoom;
 	
 	public Vector2 WorldToScreenPosition(Vector2 worldPosition)
@@ -116,7 +125,10 @@ public class Camera
 		if (size.x <= 0 || size.y <= 0)
 			return;
 		
-		UpdateScreenProjection();
+		if (resolutionAuto)
+			resolution = R.game.window.frameBufferSize;
+		else
+			UpdateScreenProjection();
 	}
 	
 	private void UpdateRenderTexture()
@@ -134,10 +146,12 @@ public class Camera
 	{
 		var frameBufferSize = R.game.window.frameBufferSize.ToVector2();
 		
-		displayScale = float.Ceiling(MathF.Max(
-			frameBufferSize.x / resolution.x,
-			frameBufferSize.y / resolution.y
-		));
+		displayScale = resolutionAuto
+				? 1
+				: float.Ceiling(MathF.Max(
+					frameBufferSize.x / resolution.x,
+					frameBufferSize.y / resolution.y
+				));
 		
 		displaySize = resolution * displayScale;
 		displayPosition = (frameBufferSize - displaySize) * 0.5F;
