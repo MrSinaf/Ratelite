@@ -55,7 +55,7 @@ public class Shader : IResourceAsync<Shader>
 		using var reader = new StreamReader(ress.stream);
 		var shad = await reader.ReadToEndAsync();
 		
-		var (vertexShader, fragmentShader) = Utils.ShaderFactory.Build(shad);
+		var (vertexShader, fragmentShader) = ShaderFactory.Build(shad);
 		var layout = """
 					 layout(std140) uniform Default {
 					     float time;
@@ -70,7 +70,7 @@ public class Shader : IResourceAsync<Shader>
 		Shader? shader = null;
 		MainThread.Enqueue(() => shader = new Shader(
 			vertexShader, fragmentShader,
-			Utils.ShaderFactory.ExtractUniformsWithDefaultValue(shad)
+			ShaderFactory.ExtractUniformsWithDefaultValue(shad)
 		));
 		await MainThread.Wait();
 		return shader ?? throw new NullReferenceException();

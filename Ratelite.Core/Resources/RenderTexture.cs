@@ -5,9 +5,9 @@ namespace Ratelite.Resources;
 
 public class RenderTexture : Texture
 {
-	public Vector2Int size { get; private set; }
-	public uint width { get; set; }
-	public uint height { get; set; }
+	public readonly Vector2Int size;
+	public readonly uint width;
+	public readonly uint height;
 	public Vector2 texel { get; private set; }
 	public Color clearColor = R.game.backgroundColor;
 	

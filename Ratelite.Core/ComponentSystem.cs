@@ -27,6 +27,24 @@ public class ComponentSystem<T> where T : class, IComponent
 		return component;
 	}
 	
+	public TC AddComponent<TC>(TC component) where TC : T
+	{
+		components.Add(component);
+		
+		component.enable = true;
+		switch (component)
+		{
+			case IRenderableComponent renderable:
+				renderableComponents.Add(renderable);
+				break;
+			case IUpdatableComponent updatable:
+				updatableComponents.Add(updatable);
+				break;
+		}
+		
+		return component;
+	}
+	
 	public void RemoveComponent<TC>(TC component) where TC : T
 	{
 		components.Remove(component);
