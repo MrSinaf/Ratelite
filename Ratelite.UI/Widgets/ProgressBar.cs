@@ -8,6 +8,15 @@ public class ProgressBar : UIElement
 	public event Action<float> onValueChanged = delegate { };
 	
 	private float _value;
+	public float value
+	{
+		get => _value;
+		set
+		{
+			_value = value;
+			CheckValue();
+		}
+	}
 	
 	public float maxValue
 	{
@@ -29,15 +38,6 @@ public class ProgressBar : UIElement
 		}
 	}
 	
-	public float value
-	{
-		get => _value;
-		set
-		{
-			_value = value;
-			CheckValue();
-		}
-	}
 	
 	public ProgressBar(float value, float minValue = 0, float maxValue = 1, string? prefab = "")
 	{
