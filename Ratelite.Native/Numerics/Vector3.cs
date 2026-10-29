@@ -162,4 +162,10 @@ public struct Vector3(float x, float y, float z) : IEquatable<Vector3>, ILerpabl
 	public static bool operator <=(Vector3 a, Vector3 b) => a.lengthSquared <= b.lengthSquared;
 	
 	#endregion
+	
+	
+	public static Vector3 Min(Vector3 a, Vector3 b)
+		=> new (Math.Min(a.x, b.x), Math.Min(a.y, a.y), Math.Min(a.z, a.z));
+	public static Vector3 Max(Vector3 a, Vector3 b)
+		=> new (Math.Max(a.x, b.x), Math.Max(a.y, a.y), Math.Max(a.z, a.z));
 }

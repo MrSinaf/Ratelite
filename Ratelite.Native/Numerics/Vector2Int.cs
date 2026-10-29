@@ -135,4 +135,9 @@ public struct Vector2Int(int x, int y) : IEquatable<Vector2Int>, ILerpable<Vecto
 		=> a.lengthSquared <= b.lengthSquared;
 	
 	#endregion
+	
+	public static Vector2Int Min(Vector2Int a, Vector2Int b)
+		=> new (Math.Min(a.x, b.x), Math.Min(a.y, a.y));
+	public static Vector2Int Max(Vector2Int a, Vector2Int b)
+		=> new (Math.Max(a.x, b.x), Math.Max(a.y, a.y));
 }

@@ -140,4 +140,9 @@ public struct Vector2(float x, float y) : IEquatable<Vector2>, ILerpable<Vector2
 	public static bool operator <=(Vector2 a, Vector2 b) => a.length <= b.length;
 	
 	#endregion
+	
+	public static Vector2 Min(Vector2 a, Vector2 b)
+		=> new (Math.Min(a.x, b.x), Math.Min(a.y, a.y));
+	public static Vector2 Max(Vector2 a, Vector2 b)
+		=> new (Math.Max(a.x, b.x), Math.Max(a.y, a.y));
 }

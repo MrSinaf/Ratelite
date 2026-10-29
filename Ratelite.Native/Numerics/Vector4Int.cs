@@ -158,4 +158,9 @@ public struct Vector4Int(int x, int y, int z, int w) : IEquatable<Vector4Int>, I
 		=> a.lengthSquared <= b.lengthSquared;
 	
 	#endregion
+	
+	public static Vector4Int Min(Vector4Int a, Vector4Int b)
+		=> new (Math.Min(a.x, b.x), Math.Min(a.y, a.y), Math.Min(a.z, a.z), Math.Min(a.w, a.w));
+	public static Vector4Int Max(Vector4Int a, Vector4Int b)
+		=> new (Math.Max(a.x, b.x), Math.Max(a.y, a.y), Math.Max(a.z, a.z), Math.Max(a.w, a.w));
 }

@@ -172,4 +172,9 @@ public struct Vector4(float x, float y, float z, float w) : IEquatable<Vector4>,
 	public static bool operator <=(Vector4 a, Vector4 b) => a.lengthSquared <= b.lengthSquared;
 	
 	#endregion
+	
+	public static Vector4 Min(Vector4 a, Vector4 b)
+		=> new (Math.Min(a.x, b.x), Math.Min(a.y, a.y), Math.Min(a.z, a.z), Math.Min(a.w, a.w));
+	public static Vector4 Max(Vector4 a, Vector4 b)
+		=> new (Math.Max(a.x, b.x), Math.Max(a.y, a.y), Math.Max(a.z, a.z), Math.Max(a.w, a.w));
 }

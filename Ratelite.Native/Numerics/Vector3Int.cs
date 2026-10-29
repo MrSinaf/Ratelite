@@ -159,4 +159,9 @@ public struct Vector3Int(int x, int y, int z) : IEquatable<Vector3Int>, ILerpabl
 		=> a.lengthSquared <= b.lengthSquared;
 	
 	#endregion
+	
+	public static Vector3Int Min(Vector3Int a, Vector3Int b)
+		=> new (Math.Min(a.x, b.x), Math.Min(a.y, a.y), Math.Min(a.z, a.z));
+	public static Vector3Int Max(Vector3Int a, Vector3Int b)
+		=> new (Math.Max(a.x, b.x), Math.Max(a.y, a.y), Math.Max(a.z, a.z));
 }
