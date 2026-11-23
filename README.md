@@ -2,7 +2,7 @@
   <img src="Ratelite.Core/assets/textures/icon-rat.png"/>
 </div>
 <div align="center">
-  > Moteur de jeu 2D développé entièrement en C# sous .NET10 <
+  > Moteur de jeu 2D développé entièrement en C# sous .NET11 <
 </div>
 
 > [!caution]

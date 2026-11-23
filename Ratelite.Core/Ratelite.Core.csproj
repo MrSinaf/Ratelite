@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFramework>net11.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         
@@ -27,7 +27,7 @@
         <EmbeddedResource Include="assets\**\*"/>
 
         <ProjectReference Include="..\Ratelite.Native\Ratelite.Native.csproj" />
-        <PackageReference Include="JetBrains.Annotations" Version="2025.2.4"/>
+        <PackageReference Include="JetBrains.Annotations" Version="2026.2.0" />
     </ItemGroup>
 
 </Project>
