@@ -14,7 +14,6 @@ public class Texture2D : Texture, IHotReloadResourceAsync, IResourceAsync<Textur
 	
 	public readonly Color[] pixels;
 	
-	public readonly Vector2Int size;
 	public readonly Vector2 texel;
 	
 	public Color this[int x, int y]
@@ -23,10 +22,10 @@ public class Texture2D : Texture, IHotReloadResourceAsync, IResourceAsync<Textur
 		get => pixels[x + y * size.x];
 	}
 	
-	public Texture2D(int width, int height, Color[] pixels, Config? config = null)
+	public Texture2D(int width, int height, Color[] pixels, Config? config = null) 
+			: base(new Vector2Int(width, height))
 	{
 		config ??= defaultConfig;
-		size = new Vector2Int(width, height);
 		texel = Vector2.one / size;
 		
 		this.pixels = pixels;

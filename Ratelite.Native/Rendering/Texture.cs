@@ -1,9 +1,10 @@
 ﻿namespace Ratelite.Rendering;
 
 
-public abstract class Texture
+public abstract class Texture(Vector2Int size)
 {
 	public readonly GTexture gTexture = new ();
+	public readonly Vector2Int size = size;
 	
 	public void SetWrap(TextureWrap wrap)
 	{

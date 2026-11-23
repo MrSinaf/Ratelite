@@ -5,7 +5,6 @@ namespace Ratelite.Resources;
 
 public class RenderTexture : Texture
 {
-	public readonly Vector2Int size;
 	public readonly uint width;
 	public readonly uint height;
 	public Vector2 texel { get; private set; }
@@ -16,11 +15,10 @@ public class RenderTexture : Texture
 	private readonly uint frameBufferHandle;
 	private readonly uint rbHandle;
 	
-	public RenderTexture(uint width, uint height)
+	public RenderTexture(uint width, uint height) : base(new Vector2Int((int)width, (int)height))
 	{
 		this.width = width;
 		this.height = height;
-		size = new Vector2Int((int)width, (int)height);
 		texel = Vector2.one / size;
 		
 		gTexture.SetImage2D(this.width, this.height, new Color[width * height]);
