@@ -18,6 +18,8 @@ public abstract class Mesh : IAsset, IDisposable
 	protected GBuffer<uint> indexBuffer = null!;
 	private bool isDisposed;
 	
+	public PrimitiveType type = PrimitiveType.Triangles;
+	
 	public static Mesh Create<T>(T[] vertices, int[] indices) where T : unmanaged, IVertex
 	{
 		var mesh = new Mesh<T>
@@ -49,7 +51,7 @@ public abstract class Mesh : IAsset, IDisposable
 		
 		vao.Bind();
 		GL.DrawElements(
-			PrimitiveType.Triangles,
+			type,
 			(uint)indices.Length,
 			DrawElementsType.UnsignedInt,
 			0
